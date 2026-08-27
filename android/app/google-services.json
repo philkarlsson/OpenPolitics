@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "935189180004",
+    "project_id": "openpolitics-20260825",
+    "storage_bucket": "openpolitics-20260825.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935189180004:android:c5fba11503b95bfccc3971",
+        "android_client_info": {
+          "package_name": "com.communityproject.openpolitics"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935189180004-otu0a05hgfj6tbfnvqs7tmvd0acosdf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7482CjAVPcGAqmIDJIaYJ8eML43DpOK4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935189180004-otu0a05hgfj6tbfnvqs7tmvd0acosdf9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935189180004:android:ca11e08afaf5bbd0cc3971",
+        "android_client_info": {
+          "package_name": "org.openpolitics.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935189180004-otu0a05hgfj6tbfnvqs7tmvd0acosdf9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7482CjAVPcGAqmIDJIaYJ8eML43DpOK4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935189180004-otu0a05hgfj6tbfnvqs7tmvd0acosdf9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

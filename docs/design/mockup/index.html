@@ -1,0 +1,1727 @@
+<meta charset="utf-8">
+<title>OpenPolitics · Clickdummy</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --paper: #FFFFFF; --surface: #FFFFFF; --surface-2: #F7F9F9; --line: #E6E9EA;
+    --ink: #0F1419; --ink-2: #536471; --ink-3: #8B98A5;
+    --brand: #5A4FBE; --brand-press: #4A3FA6; --brand-soft: #EDEBF7;
+    --pop: #4B3BE8; --pop-ink: #FFFFFF;
+    --yes: #00A66E; --yes-soft: #E3F7EF; --no: #E5484D; --no-soft: #FCE7E7;
+    --abstain: #C77A00; --abstain-soft: #FBEFD6;
+    --focus: 0 0 0 2px var(--surface), 0 0 0 4px rgba(75,59,232,.5);
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 12px 30px -18px rgba(0,0,0,.22);
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #000000; --surface: #000000; --surface-2: #16181C; --line: #2F3336;
+      --ink: #E7E9EA; --ink-2: #71767B; --ink-3: #71767B;
+      --brand: #8F88DA; --brand-press: #7B73C8; --brand-soft: #1D1B2C;
+      --pop: #7B6BFF; --pop-ink: #FFFFFF;
+      --yes: #00BA7C; --yes-soft: #0B2A1E; --no: #F4212E; --no-soft: #2A0E10;
+      --abstain: #FFB84D; --abstain-soft: #2E2109;
+      --focus: 0 0 0 2px var(--surface), 0 0 0 4px rgba(123,107,255,.6);
+      --shadow: 0 1px 3px rgba(0,0,0,.5), 0 18px 40px -20px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #FFFFFF; --surface: #FFFFFF; --surface-2: #F7F9F9; --line: #E6E9EA;
+    --ink: #0F1419; --ink-2: #536471; --ink-3: #8B98A5;
+    --brand: #5A4FBE; --brand-press: #4A3FA6; --brand-soft: #EDEBF7;
+    --pop: #4B3BE8; --pop-ink: #FFFFFF;
+    --yes: #00A66E; --yes-soft: #E3F7EF; --no: #E5484D; --no-soft: #FCE7E7;
+    --abstain: #C77A00; --abstain-soft: #FBEFD6;
+    --focus: 0 0 0 2px var(--surface), 0 0 0 4px rgba(75,59,232,.5);
+    --shadow: 0 1px 3px rgba(0,0,0,.04), 0 12px 30px -18px rgba(0,0,0,.22);
+  }
+  :root[data-theme="dark"] {
+    --paper: #000000; --surface: #000000; --surface-2: #16181C; --line: #2F3336;
+    --ink: #E7E9EA; --ink-2: #71767B; --ink-3: #71767B;
+    --brand: #8F88DA; --brand-press: #7B73C8; --brand-soft: #1D1B2C;
+    --pop: #7B6BFF; --pop-ink: #FFFFFF;
+    --yes: #00BA7C; --yes-soft: #0B2A1E; --no: #F4212E; --no-soft: #2A0E10;
+    --abstain: #FFB84D; --abstain-soft: #2E2109;
+    --focus: 0 0 0 2px var(--surface), 0 0 0 4px rgba(123,107,255,.6);
+    --shadow: 0 1px 3px rgba(0,0,0,.5), 0 18px 40px -20px rgba(0,0,0,.8);
+  }
+
+  body { margin: 0; }
+  .stage {
+    font-family: var(--font-sans); color: var(--ink);
+    background: var(--paper);
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 22px 16px 40px;
+  }
+  @media (prefers-color-scheme: dark) { .stage { background: #0a0a0a; } }
+  :root[data-theme="dark"] .stage { background: #0a0a0a; }
+  :root[data-theme="light"] .stage { background: #f7f9fa; }
+  .stage :focus-visible { outline: none; box-shadow: var(--focus); border-radius: 10px; }
+  button { font-family: inherit; cursor: pointer; }
+
+  .stage-top { width: 100%; max-width: 940px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.02em; font-size: 17px; }
+  .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--brand);
+    display: grid; place-items: center; box-shadow: 0 6px 16px -6px var(--brand); flex: none; }
+  .mark svg { width: 19px; height: 19px; }
+  .brand small { display: block; font-weight: 600; font-size: 10.5px; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--ink-3); margin-top: -2px; }
+  .stage-top .spacer { flex: 1; }
+  .hint { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
+  .toggle { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 13px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 999px; font-weight: 600; font-size: 13px; }
+  .toggle:hover { border-color: var(--brand); }
+
+  /* Phone */
+  .phone { width: 340px; max-width: 100%; border-radius: 46px; padding: 12px;
+    background: linear-gradient(160deg, #2a2f4a, #0d1020);
+    box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,.05) inset; }
+  .screen { position: relative; border-radius: 34px; overflow: hidden; background: var(--surface);
+    height: 700px; max-height: 78vh; min-height: 560px; }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 122px; height: 26px;
+    background: #0d1020; border-radius: 0 0 15px 15px; z-index: 30; }
+
+  /* Screen router */
+  .scrn { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--surface); }
+  .scrn.active { display: flex; }
+  @media (prefers-reduced-motion: no-preference) {
+    .scrn.active { animation: slidein .26s ease; }
+    @keyframes slidein { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+  }
+  .sbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 22px 4px;
+    font-size: 12px; font-weight: 700; color: var(--ink); flex: none; }
+  .sbar .dots { display: flex; gap: 4px; } .sbar .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--ink); opacity: .5; }
+  .view { flex: 1; overflow-y: auto; padding: 4px 18px 16px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .view::-webkit-scrollbar { width: 0; }
+
+  /* App header (back) */
+  .apphd { display: flex; align-items: center; gap: 10px; padding: 6px 14px 8px; flex: none; }
+  .back { width: 38px; height: 38px; border-radius: 999px; border: none;
+    background: none; display: grid; place-items: center; color: var(--ink); }
+  .back:hover { background: var(--surface-2); }
+  .apphd .ttl { font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+  .apphd .spacer { flex: 1; }
+
+  /* atoms */
+  .locchip { display: inline-flex; align-items: center; gap: 7px; background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px 6px 10px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+  .locchip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
+  .greet { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin: 10px 0 2px; }
+  .sub { color: var(--ink-3); font-size: 13px; }
+  .topbar { position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: 10px;
+    margin: 0 -18px; padding: 7px 12px; min-height: 50px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: blur(12px); }
+  .topbar .tt { flex: 1; text-align: center; font-weight: 800; font-size: 16px; letter-spacing: -.01em; line-height: 1.1; }
+  .topbar .tt small { display: block; font-weight: 500; font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+  .toptabs { position: sticky; top: 50px; z-index: 5; display: flex; margin: 0 -18px; padding-left: 14px;
+    overflow-x: auto; scrollbar-width: none;
+    border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 85%, transparent); backdrop-filter: blur(12px); }
+  .toptabs::-webkit-scrollbar { display: none; }
+  .toptab { flex: 0 0 auto; background: none; border: none; padding: 15px 14px 13px; font-size: 14.5px; font-weight: 600;
+    color: var(--ink-3); position: relative; white-space: nowrap; }
+  .toptab:hover { background: var(--surface-2); }
+  .toptab.on { color: var(--ink); font-weight: 800; }
+  .toptab.on::after { content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+    width: calc(100% - 20px); min-width: 32px; height: 4px; border-radius: 999px; background: var(--rc, var(--brand)); }
+
+  /* content-type badge (icon + colour per type) */
+  .ptype { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 800;
+    padding: 3px 9px 3px 7px; border-radius: 999px; line-height: 1; margin: 0 0 9px; letter-spacing: .01em;
+    background: var(--t-bg); color: var(--t-fg); }
+  .ptype svg { width: 13px; height: 13px; }
+  .t-beitrag    { --t-bg: rgba(99,114,130,.16);  --t-fg: #7a8794; }
+  .t-problem    { --t-bg: rgba(229,72,77,.15);   --t-fg: #e0555a; }
+  .t-idee       { --t-bg: rgba(199,122,0,.18);   --t-fg: #d59120; }
+  .t-diskussion { --t-bg: rgba(122,112,220,.18); --t-fg: #8f88da; }
+  .t-umfrage    { --t-bg: rgba(0,166,110,.16);   --t-fg: #12b17d; }
+
+  /* role / acting-account theming — header + bottom nav recolour per profile type */
+  #screen { --rc: var(--brand); }
+  #screen[data-role="party"] { --rc: #2e8b57; }
+  #screen[data-role="city"]  { --rc: #2f6fb0; }
+  #screen[data-role="party"] .topbar, #screen[data-role="city"] .topbar {
+    background: color-mix(in srgb, var(--rc) 10%, var(--surface));
+    border-bottom: 2px solid var(--rc); }
+  #screen[data-role="party"] .tabbar, #screen[data-role="city"] .tabbar {
+    border-top: 1px solid var(--rc);
+    background: color-mix(in srgb, var(--rc) 7%, var(--surface)); }
+  .acctchip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 6px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface-2); font-size: 13px; font-weight: 700; color: var(--ink); }
+  .acctchip .av { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+    color: #fff; font-size: 10px; font-weight: 800; background: linear-gradient(135deg, var(--brand), #9a86ff); }
+  .acctchip .cx { color: var(--ink-3); font-size: 12px; }
+
+  /* search: content-type filter chips */
+  .typefilter { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 14px -18px 0; padding: 2px 18px; }
+  .typefilter::-webkit-scrollbar { display: none; }
+  .tfilter { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700;
+    padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); white-space: nowrap; }
+  .tfilter svg { width: 13px; height: 13px; }
+  .tfilter.on { background: var(--t-bg, var(--brand-soft)); color: var(--t-fg, var(--brand)); border-color: transparent; }
+
+  /* home filter button: active-count badge */
+  [data-filter] { position: relative; overflow: visible; }
+  .fbadge { position: absolute; top: -3px; right: -3px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box;
+    border-radius: 999px; background: var(--rc, var(--brand)); color: #fff; font-size: 10px; font-weight: 800; line-height: 1;
+    display: none; align-items: center; justify-content: center; border: 1.5px solid var(--surface); }
+  .fbadge.show { display: inline-flex; }
+  .searchmini { flex: 1; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; min-width: 0;
+    border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-3);
+    font-size: 14px; font-weight: 500; }
+  .searchmini svg { width: 17px; height: 17px; flex: none; }
+  .searchmini:hover { border-color: var(--ink-3); }
+  .fchips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fchip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px 7px 11px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+  .fchip .fl { font-size: 15px; line-height: 1; }
+  .fchip .x { display: inline-flex; width: 17px; height: 17px; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--surface-2); color: var(--ink-3); font-size: 12px; }
+  .fchip.on { background: var(--surface-2); border-color: transparent; }
+  .fchip.on .x { background: var(--ink); color: var(--surface); }
+  .fchip.off { border-style: dashed; color: var(--ink-2); }
+  .fchip.off .x { background: none; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; margin: 14px -18px 4px; padding: 0 18px 2px; }
+  .chips::-webkit-scrollbar { height: 0; }
+  .chip { font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 999px; white-space: nowrap;
+    background: var(--surface-2); border: 1px solid transparent; color: var(--ink-2); }
+  .chip.on { background: var(--brand-soft); color: var(--brand); border-color: transparent; font-weight: 700; }
+
+  .card { background: var(--surface); border: none; border-bottom: 1px solid var(--line); border-radius: 0;
+    padding: 14px 0; margin: 0; text-align: left; width: 100%; display: block; color: inherit; }
+  button.card { cursor: pointer; }
+  button.card:hover { background: var(--surface-2); }
+  .card .meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-3); font-weight: 600; }
+  .avatar { width: 26px; height: 26px; border-radius: 50%; flex: none; color: #fff; font-size: 11px; font-weight: 800;
+    display: grid; place-items: center; background: linear-gradient(135deg, var(--brand), #8f7bff); }
+  .avatar.g2 { background: linear-gradient(135deg, #0e9f6e, #45d3a2); }
+  .avatar.g3 { background: linear-gradient(135deg, #e0642b, #f2a541); }
+  .avatar.lg { width: 34px; height: 34px; font-size: 13px; border-radius: 50%; }
+  .tag { font-size: 12.5px; font-weight: 700; letter-spacing: 0; text-transform: none; padding: 0; border-radius: 0; background: none; color: var(--ink-2); }
+  .tag.vote, .tag.live, .tag.disc { background: none; color: var(--ink-2); }
+  .card h3 { font-size: 15.5px; line-height: 1.25; letter-spacing: -.01em; margin: 9px 0 0; font-weight: 700; }
+  .card .excerpt { font-size: 13px; color: var(--ink-2); margin: 6px 0 0; }
+  .cardfoot { display: flex; align-items: center; gap: 16px; margin-top: 11px; font-size: 12px; color: var(--ink-3); font-weight: 600; }
+
+  .bar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; margin: 9px 0 0; background: var(--surface-2); }
+  .bar i { display: block; height: 100%; transition: width .35s ease; }
+  .bar .y { background: var(--yes); } .bar .n { background: var(--no); } .bar .a { background: var(--abstain); }
+  .quorum { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-3); font-weight: 600; margin-top: 9px; }
+  .quorum b { color: var(--ink); }
+
+  /* poll (X-style stacked bars) */
+  .poll { display: flex; flex-direction: column; gap: 6px; margin: 12px 0 0; width: 100%; }
+  .pollrow { position: relative; height: 42px; border-radius: 8px; overflow: hidden; width: 100%; text-align: left;
+    border: none; background: var(--surface-2); color: var(--ink); display: flex; align-items: center; }
+  button.pollrow { cursor: pointer; }
+  .pollrow .pfill { position: absolute; left: 0; top: 0; bottom: 0; transition: width .35s ease;
+    background: color-mix(in srgb, var(--ink) 9%, var(--surface)); }
+  .pollrow.win .pfill { background: color-mix(in srgb, var(--brand) 24%, var(--surface)); }
+  .pollrow .plabel { position: relative; z-index: 1; padding-left: 14px; font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px; }
+  .pollrow.win .plabel { color: var(--brand); font-weight: 800; }
+  .pollrow .ppct { position: relative; z-index: 1; margin-left: auto; padding-right: 14px; font-size: 14px;
+    font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .pollrow.win .ppct { color: var(--brand); }
+  .pollrow.sel { box-shadow: inset 0 0 0 2px var(--brand); }
+
+  /* ---- Beitrag (post) component ---- */
+  .post { display: block; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  /* AuthorHeader: avatar · [DisplayName / @username + status] · ⋮ */
+  .ah { display: flex; align-items: center; gap: 10px; padding: 2px 0; }
+  .ah .avatar { width: 38px; height: 38px; font-size: 14px; border-radius: 50%; flex: none; }
+  .ah-id { min-width: 0; flex: 1; }
+  .ah-name { font-weight: 800; font-size: 15px; letter-spacing: -.01em; line-height: 1.15;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ah-sub { display: flex; align-items: center; gap: 5px; line-height: 1.15; margin-top: 1px; }
+  .ah-sub small { color: var(--ink-3); font-size: 13px; }
+  .ah-sub .vf { width: 14px; height: 14px; flex: none; }
+  .post-head b { font-weight: 800; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .post-head .vf { width: 14px; height: 14px; flex: none; }
+  .post-head .muted { color: var(--ink-3); font-weight: 500; white-space: nowrap; }
+  .more { margin-left: auto; flex: none; background: none; border: none; color: var(--ink-3);
+    width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; }
+  .more:hover { background: var(--surface-2); color: var(--ink); }
+  .post-clip { display: block; text-align: left; width: 100%; background: none; border: none; padding: 0; color: inherit; cursor: pointer; font: inherit; }
+  .post-text { margin-top: 2px; font-size: 14.5px; line-height: 1.45; color: var(--ink); white-space: pre-wrap; }
+  .post-text .mention { color: var(--brand); }
+
+  /* media */
+  .media { margin-top: 10px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+  .media-grid { display: grid; gap: 2px; grid-template-columns: 1fr 1fr; }
+  .ph { display: block; width: 100%; aspect-ratio: 16 / 10;
+    background: linear-gradient(135deg, #c7cdd6, #98a2b3); }
+  .ph.a { background: linear-gradient(135deg, #b7c4d6, #7b8aa5); }
+  .ph.b { background: linear-gradient(135deg, #cbd3c0, #98a886); }
+  .video { position: relative; margin-top: 10px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+  .video .ph { aspect-ratio: 16 / 9; }
+  .playbtn { position: absolute; inset: 0; margin: auto; width: 54px; height: 54px; border-radius: 50%;
+    background: rgba(0,0,0,.55); color: #fff; display: grid; place-items: center; }
+  .playbtn svg { width: 24px; height: 24px; margin-left: 3px; }
+  .video .dur { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,.72); color: #fff;
+    font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+
+  /* quote (embedded post) */
+  .quote { margin-top: 10px; border: 1px solid var(--line); border-radius: 16px; padding: 11px 13px; }
+  .quote-head { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .quote-head .avatar { width: 20px; height: 20px; font-size: 9px; }
+  .quote-head b { font-weight: 800; } .quote-head .muted { color: var(--ink-3); font-weight: 500; }
+  .quote-body { font-size: 13.5px; color: var(--ink); margin-top: 5px; line-height: 1.4; }
+
+  /* link / reference card */
+  .linkcard { margin-top: 10px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .linkcard .ph { aspect-ratio: 16 / 8; }
+  .lk-meta { padding: 10px 13px; }
+  .lk-dom { font-size: 12px; color: var(--ink-3); }
+  .lk-title { font-size: 14px; font-weight: 700; margin-top: 2px; line-height: 1.3; }
+  .lk-desc { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; }
+
+  /* action row */
+  .post-actions { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .act { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; padding: 4px 3px;
+    color: var(--ink-3); font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; border-radius: 999px; }
+  .act svg { width: 15px; height: 15px; }
+  .act:hover { color: var(--brand); background: var(--brand-soft); }
+  .act.on { color: var(--brand); }
+  .act.act-like.on svg { fill: currentColor; }
+  .act-spacer { flex: 1; }
+
+  /* ---- detail view (AuthorHeader → content → time → actions → comments) ---- */
+  .detail-head { display: flex; align-items: center; gap: 9px; padding: 6px 0 2px; }
+  .detail-head .avatar { width: 34px; height: 34px; font-size: 12px; border-radius: 50%; }
+  .dh-id { min-width: 0; }
+  .dh-name { display: flex; align-items: center; gap: 5px; font-weight: 800; font-size: 15px; letter-spacing: -.01em; }
+  .dh-name .vf { width: 15px; height: 15px; flex: none; }
+  .dh-handle { color: var(--ink-3); font-size: 13.5px; }
+  .detail-title { font-size: 20px; font-weight: 800; letter-spacing: -.02em; line-height: 1.25; margin-top: 12px; }
+  .detail-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin-top: 8px; }
+  .detail-time { font-size: 13.5px; color: var(--ink-3); padding: 14px 0; margin-top: 14px;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .detail-time b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .detail-actions { justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  .detail-comments { margin-top: 10px; }
+  .dc-compose { display: flex; align-items: center; gap: 10px; padding: 6px 0 12px; }
+  .dc-compose .avatar { width: 34px; height: 34px; font-size: 12px; }
+  .dc-compose .fake-input { flex: 1; background: var(--surface-2); border-radius: 999px; padding: 11px 14px; font-size: 13px; color: var(--ink-3); }
+
+  /* attachments / sources accordion */
+  .attach { margin-top: 14px; }
+  .attach-toggle { width: 100%; display: flex; align-items: center; gap: 9px; padding: 12px 0;
+    background: none; border: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    font-size: 14px; font-weight: 700; color: var(--ink); }
+  .attach-toggle:hover { color: var(--brand); }
+  .attach-count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--surface-2);
+    color: var(--ink-2); font-size: 11.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+  .attach-chev { margin-left: auto; color: var(--ink-3); font-size: 11px; transition: transform .2s ease; }
+  .attach-toggle[aria-expanded="true"] { border-bottom: none; }
+  .attach-toggle[aria-expanded="true"] .attach-chev { transform: rotate(180deg); }
+  .attach-body { padding: 4px 0 12px; border-bottom: 1px solid var(--line); }
+  .attach-item { display: flex; align-items: center; gap: 10px; padding: 11px 0; width: 100%; text-align: left;
+    background: none; border: none; border-bottom: 1px solid var(--line); color: var(--ink); }
+  .attach-item:last-of-type { border-bottom: none; }
+  .attach-ic { width: 34px; height: 34px; border-radius: 9px; background: var(--surface-2); display: grid; place-items: center; flex: none; font-size: 16px; }
+  .attach-tx { min-width: 0; }
+  .attach-tx .t { display: block; font-size: 13.5px; font-weight: 700; }
+  .attach-tx .s { display: block; font-size: 12px; color: var(--ink-3); }
+  .attach-item .x { margin-left: auto; color: var(--ink-3); font-size: 13px; padding-left: 8px; }
+  .attach-add { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; margin-top: 8px;
+    width: 100%; border: 1.5px dashed var(--line); border-radius: 11px; background: none; color: var(--ink-2); font-weight: 700; font-size: 13px; }
+  .attach-add:hover { border-color: var(--brand); color: var(--brand); }
+
+  .tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .tbtn { border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 6px; text-align: center; }
+  .tbtn .n { font-family: var(--font-mono); font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .tbtn .l { font-size: 11px; font-weight: 700; margin-top: 1px; }
+  .tbtn.y { border-color: color-mix(in srgb, var(--yes) 40%, var(--line)); }
+  .tbtn.y .n, .tbtn.y .l { color: var(--yes); }
+  .tbtn.y.sel { background: var(--yes-soft); border-color: var(--yes); box-shadow: inset 0 0 0 1px var(--yes); }
+  .tbtn.nn { border-color: color-mix(in srgb, var(--no) 32%, var(--line)); }
+  .tbtn.nn .n, .tbtn.nn .l { color: var(--no); }
+  .tbtn.nn.sel { background: var(--no-soft); border-color: var(--no); box-shadow: inset 0 0 0 1px var(--no); }
+  .tbtn.ab { border-color: color-mix(in srgb, var(--abstain) 32%, var(--line)); }
+  .tbtn.ab .n, .tbtn.ab .l { color: var(--abstain); }
+  .tbtn.ab.sel { background: var(--abstain-soft); border-color: var(--abstain); box-shadow: inset 0 0 0 1px var(--abstain); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+    height: 46px; border-radius: 999px; border: none; background: var(--ink); color: var(--surface); font-weight: 700; font-size: 15px; }
+  .btn:hover { opacity: .88; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+  .btn.ghost:hover { opacity: 1; background: var(--surface-2); }
+  .btn.sm { height: 42px; font-size: 14px; }
+
+  /* tab bar */
+  .tabbar { display: flex; align-items: flex-end; justify-content: space-around; height: 62px; flex: none;
+    border-top: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(8px); padding: 0 6px 5px; }
+  .tab { display: flex; align-items: center; justify-content: center; padding: 8px;
+    color: var(--ink-2); flex: 1; background: none; border: none; }
+  .tab svg { width: 26px; height: 26px; }
+  .tab.on { color: var(--rc, var(--brand)); }
+  .tab .tav { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--brand), #9a86ff); color: #fff; font-size: 10.5px; font-weight: 800;
+    transition: box-shadow .12s; }
+  .tab.on .tav { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--rc, var(--brand)); }
+  .composefab { position: absolute; right: 16px; bottom: 78px; width: 52px; height: 52px; border-radius: 999px;
+    background: var(--rc, var(--brand)); color: #fff; border: none; display: grid; place-items: center; z-index: 15;
+    box-shadow: 0 6px 16px -6px rgba(0,0,0,.4); }
+  .composefab svg { width: 24px; height: 24px; }
+  .composefab:hover { filter: brightness(.92); }
+
+  /* onboarding */
+  .obwrap { flex: 1; display: flex; flex-direction: column; padding: 8px 22px 22px; overflow-y: auto; }
+  .hero-mark { width: 62px; height: 62px; border-radius: 20px; background: var(--brand); display: grid; place-items: center;
+    box-shadow: 0 14px 30px -12px var(--brand); }
+  .hero-mark svg { width: 34px; height: 34px; }
+  .obtitle { font-size: 27px; font-weight: 800; letter-spacing: -.035em; line-height: 1.08; margin-top: 20px; text-wrap: balance; }
+  .obtitle .u { color: var(--brand); }
+  .obsub { color: var(--ink-2); font-size: 14px; margin-top: 12px; line-height: 1.55; }
+  .brandblock { text-align: center; padding-top: 26px; }
+  .brandblock .hero-mark { margin: 0 auto; }
+  .wordmark { font-size: 22px; font-weight: 800; letter-spacing: -.03em; margin-top: 14px; }
+  .loginform { display: grid; gap: 11px; margin-top: 26px; }
+  .tflabel { display: block; font-size: 12px; font-weight: 700; color: var(--ink-2); margin: 0 0 5px 2px; }
+  .tf { width: 100%; height: 50px; border: 1.5px solid var(--line); border-radius: 13px; background: var(--surface);
+    padding: 0 14px; font-family: inherit; font-size: 15px; font-weight: 600; color: var(--ink); outline: none; }
+  .tf::placeholder { color: var(--ink-3); font-weight: 500; }
+  .tf:focus { border-color: var(--brand); box-shadow: var(--focus); }
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--ink-3); font-size: 12px; font-weight: 600; margin: 4px 0; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .loginfoot { text-align: center; font-size: 13.5px; color: var(--ink-3); font-weight: 500; padding: 6px 0; }
+  .loginfoot button { background: none; border: none; color: var(--brand); font-weight: 700; font-family: inherit; font-size: 13.5px; padding: 0; cursor: pointer; }
+  .steps { display: flex; gap: 6px; margin: 4px 0 16px; }
+  .steps i { flex: 1; height: 5px; border-radius: 999px; background: var(--surface-2); }
+  .steps i.done { background: var(--brand); }
+  /* settings / account list */
+  .setgrp { font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; margin: 20px 4px 4px; }
+  .setlist { border: none; border-radius: 0; overflow: visible; background: transparent; margin: 0 -18px; }
+  .setrow { width: 100%; text-align: left; background: none; border: none; display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px; font-size: 14.5px; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--line); }
+  .setrow:last-child { border-bottom: none; }
+  .setrow:hover { background: var(--surface-2); }
+  .setrow .ic { font-size: 17px; width: 22px; text-align: center; flex: none; }
+  .setrow .sub { display: block; font-size: 12px; font-weight: 500; color: var(--ink-3); margin-top: 1px; }
+  .setrow .chev { margin-left: auto; color: var(--ink-3); flex: none; }
+  .setrow.danger { color: var(--no); }
+  .setrow.danger .ic { color: var(--no); }
+  /* address search */
+  .addr { display: flex; align-items: center; gap: 8px; margin-top: 10px; height: 54px;
+    border: 1.5px solid var(--line); border-radius: 14px; padding: 0 8px 0 14px; background: var(--surface); }
+  .addr:focus-within { border-color: var(--brand); box-shadow: var(--focus); }
+  .addr .si { color: var(--ink-3); font-size: 15px; }
+  .addr input { flex: 1; min-width: 0; border: none; background: none; outline: none; height: 100%;
+    font-family: inherit; font-size: 15px; font-weight: 600; color: var(--ink); }
+  .addr input::placeholder { color: var(--ink-3); font-weight: 500; }
+  .gps { width: 40px; height: 40px; border-radius: 11px; flex: none; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--ink-2); display: grid; place-items: center; }
+  .gps:hover { color: var(--brand); border-color: var(--brand); background: var(--surface); }
+  .suggest { margin-top: 6px; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; background: var(--surface); }
+  .suggest:empty { display: none; }
+  .sugg { width: 100%; text-align: left; background: none; border: none; padding: 12px 14px;
+    font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--line); }
+  .sugg:last-child { border-bottom: none; }
+  .sugg:hover { background: var(--surface-2); color: var(--brand); }
+  .sugg .k { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; }
+  .addrnote { display: flex; gap: 7px; align-items: flex-start; font-size: 12px; font-weight: 500; color: var(--ink-3); line-height: 1.45; margin: 10px 2px 0; }
+
+  /* scope levels */
+  .scopehd { font-size: 12px; font-weight: 700; color: var(--ink-2); text-transform: uppercase; letter-spacing: .04em; margin-top: 22px; }
+  .scopesub { font-size: 12.5px; color: var(--ink-3); margin-top: 4px; }
+  .scoperow { width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    border: 1.5px solid var(--line); border-radius: 13px; margin-top: 8px; background: var(--surface); }
+  .scoperow.on { border-color: color-mix(in srgb, var(--brand) 34%, var(--line)); background: color-mix(in srgb, var(--brand) 5%, var(--surface)); }
+  .scoperow .ic { font-size: 17px; opacity: .55; }
+  .scoperow.on .ic { opacity: 1; }
+  .scoperow .nm { display: block; font-weight: 700; font-size: 14px; }
+  .scoperow .lv { font-size: 11px; color: var(--ink-3); font-weight: 600; }
+  .scoperow .tog { margin-left: auto; width: 26px; height: 26px; border-radius: 8px; flex: none;
+    border: 1.5px solid var(--line); display: grid; place-items: center; color: transparent; font-weight: 900; font-size: 14px; }
+  .scoperow.on .tog { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+  /* interests */
+  .obfixed { flex: none; padding: 4px 18px 10px; }
+  .obscroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 18px 8px; scrollbar-width: none; }
+  .obscroll::-webkit-scrollbar { width: 0; }
+  .intscroll { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 18px 6px; scrollbar-width: none;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
+  .intscroll::-webkit-scrollbar { width: 0; }
+  .intchip { display: flex; align-items: center; gap: 8px; padding: 13px 12px; text-align: left;
+    border: 1.5px solid var(--line); border-radius: 13px; background: var(--surface);
+    font-weight: 600; font-size: 13.5px; color: var(--ink); }
+  .intchip.on { border-color: color-mix(in srgb, var(--brand) 42%, var(--line)); background: color-mix(in srgb, var(--brand) 6%, var(--surface)); color: var(--ink); }
+  .intchip .e { font-size: 16px; flex: none; opacity: .6; }
+  .intchip.on .e { opacity: 1; }
+  .obbottom { flex: none; padding: 10px 18px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--surface); }
+  .intcount { font-size: 12.5px; color: var(--ink-3); font-weight: 600; margin: 0 0 10px; text-align: center; }
+
+  /* discussion */
+  .thread { display: flex; gap: 10px; margin-top: 14px; }
+  .thread .rail { width: 26px; display: flex; flex-direction: column; align-items: center; }
+  .thread .line { width: 2px; flex: 1; background: var(--line); margin-top: 4px; }
+  .bubble { flex: 1; background: var(--surface-2); border-radius: 4px 14px 14px 14px; padding: 10px 12px; }
+  .bubble .who { font-size: 12px; font-weight: 700; } .bubble .who span { color: var(--ink-3); font-weight: 600; }
+  .bubble p { font-size: 13px; margin: 5px 0 0; }
+  .react { display: flex; gap: 12px; margin-top: 8px; font-size: 11.5px; color: var(--ink-3); font-weight: 700; }
+  .react .up { color: var(--brand); }
+  .nested { margin-left: 12px; }
+  .composer { display: flex; gap: 8px; align-items: center; padding: 8px 14px; border-top: 1px solid var(--line); flex: none; }
+  .composer .fake-input { flex: 1; background: var(--surface-2); border-radius: 999px; padding: 12px 14px; font-size: 13px; color: var(--ink-3); }
+
+  /* profile */
+  .phead { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 10px; }
+  .pavatar { width: 78px; height: 78px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #9a86ff);
+    color: #fff; font-size: 29px; font-weight: 800; display: grid; place-items: center; }
+  .pname { font-size: 21px; font-weight: 800; letter-spacing: -.02em; margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+  .phandle { color: var(--ink-3); font-size: 13px; }
+  .pbio { font-size: 13px; color: var(--ink-2); margin-top: 10px; max-width: 30ch; }
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; width: 100%; margin-top: 16px; }
+  .stat { background: var(--surface-2); border-radius: 13px; padding: 12px 6px; text-align: center; }
+  .stat .n { font-family: var(--font-mono); font-weight: 700; font-size: 17px; font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 11px; color: var(--ink-3); font-weight: 600; margin-top: 1px; }
+  .scopes { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; justify-content: center; }
+  .scope { font-size: 12px; font-weight: 600; padding: 6px 11px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); }
+
+  /* search */
+  .searchbar { display: flex; align-items: center; gap: 9px; background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 13px; padding: 12px 14px; margin-top: 8px; color: var(--ink-3); font-size: 14px; }
+  .trend { display: flex; align-items: center; gap: 10px; padding: 12px 2px; border-bottom: 1px solid var(--line); }
+  .trend .rank { font-family: var(--font-mono); font-weight: 700; color: var(--ink-3); width: 20px; }
+  .trend .t { font-weight: 700; font-size: 14px; } .trend .s { font-size: 12px; color: var(--ink-3); }
+
+  /* notifications */
+  .noti { display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left;
+    padding: 14px 0; border-bottom: 1px solid var(--line); background: none; border-left: none; border-right: none; border-top: none; }
+  .noti.unread { position: relative; }
+  .noti.unread::before { content: ""; position: absolute; left: -10px; top: 20px; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+  .noti-ic { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; }
+  .noti-ic svg { width: 17px; height: 17px; }
+  .noti-ic.like { background: var(--no); }
+  .noti-ic.reply { background: var(--brand); }
+  .noti-ic.follow { background: var(--ink-2); }
+  .noti-ic.vote { background: var(--yes); }
+  .noti-ic.mention { background: var(--brand); font-size: 16px; }
+  .noti-tx { flex: 1; font-size: 14px; line-height: 1.45; color: var(--ink); min-width: 0; }
+  .noti-tx b { font-weight: 700; }
+  .noti-t { display: block; font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+  .noti:hover { background: var(--surface-2); }
+  .panel[hidden] { display: none; }
+
+  /* bottom sheet */
+  .sheet-bg { position: absolute; inset: 0; background: rgba(10,12,25,.42); z-index: 40; display: none; }
+  .sheet-bg.open { display: block; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); z-index: 41;
+    border-radius: 22px 22px 0 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); transform: translateY(100%);
+    transition: transform .28s ease; max-height: 70%; overflow-y: auto; box-shadow: 0 -10px 30px -10px rgba(0,0,0,.3); }
+  .sheet.open { transform: none; }
+  .sheet .grip { width: 38px; height: 4px; border-radius: 999px; background: var(--line); margin: 4px auto 10px; }
+  .sheet h4 { font-size: 15px; font-weight: 800; margin: 2px 4px 8px; }
+  .opt { width: 100%; text-align: left; background: none; border: none; padding: 14px 6px; font-size: 15px; font-weight: 600;
+    color: var(--ink); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .opt:last-child { border-bottom: none; }
+  .opt:hover { color: var(--brand); }
+  .opt .ic { font-size: 18px; }
+
+  /* toast */
+  .toast { position: absolute; left: 50%; bottom: 82px; transform: translateX(-50%) translateY(12px);
+    background: var(--ink); color: var(--surface); font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 12px;
+    z-index: 50; opacity: 0; pointer-events: none; transition: opacity .22s ease, transform .22s ease; white-space: nowrap;
+    box-shadow: 0 12px 30px -10px rgba(0,0,0,.5); display: flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast .ck { color: var(--pop); font-weight: 900; }
+
+  .foot { margin-top: 22px; color: var(--ink-3); font-size: 12.5px; text-align: center; max-width: 340px; }
+  .foot code { font-family: var(--font-mono); color: var(--ink-2); }
+</style>
+
+<div class="stage">
+  <div class="stage-top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>OpenPolitics<small>Clickdummy</small></span>
+    </div>
+    <span class="spacer"></span>
+    <span class="hint">Klick dich durch →</span>
+    <button class="toggle" type="button" id="themeBtn" aria-pressed="false"><span id="themeIcon" aria-hidden="true">◐</span><span id="themeLbl">Dark</span></button>
+  </div>
+
+  <div class="phone">
+    <div class="screen" id="screen">
+      <span class="notch" aria-hidden="true"></span>
+
+      <!-- ONBOARDING 1 -->
+      <section class="scrn active" id="onb1" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="obwrap">
+          <div class="brandblock">
+            <div class="hero-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="wordmark">OpenPolitics</div>
+            <p class="obsub" style="margin-top:6px">Politik, die dir nah ist – und in die Hand passt.</p>
+          </div>
+          <div class="loginform">
+            <div>
+              <label class="tflabel" for="loginEmail">E-Mail</label>
+              <input class="tf" id="loginEmail" type="email" autocomplete="email" placeholder="du@beispiel.de">
+            </div>
+            <div>
+              <label class="tflabel" for="loginPass">Passwort</label>
+              <input class="tf" id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button class="btn" type="button" data-go="feed">Anmelden</button>
+            <div class="divider">oder</div>
+            <button class="btn ghost" type="button" data-go="onb2"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.6 12.2c0-.6 0-1.2-.1-1.7H12v3.3h5.4a4.6 4.6 0 01-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.1z"/><path fill="currentColor" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0012 22z"/><path fill="currentColor" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1A10 10 0 002 12c0 1.6.4 3.1 1.1 4.6L6.4 14z"/><path fill="currentColor" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0012 2 10 10 0 003.1 7.4L6.4 10c.8-2.3 3-4.1 5.6-4.1z"/></svg>Mit Google anmelden</button>
+          </div>
+          <div class="loginfoot" style="margin-top:auto">Noch kein Konto? <button type="button" data-go="onbReg">Registrieren</button></div>
+        </div>
+      </section>
+
+      <!-- REGISTER : account -->
+      <section class="scrn" id="onbReg" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="apphd"><span class="ttl">Konto erstellen</span></div>
+        <div class="obfixed">
+          <div class="steps"><i class="done"></i><i></i><i></i></div>
+          <div class="loginform" style="margin-top:8px">
+            <div>
+              <label class="tflabel" for="regEmail">E-Mail</label>
+              <input class="tf" id="regEmail" type="email" autocomplete="email" placeholder="du@beispiel.de">
+            </div>
+            <div>
+              <label class="tflabel" for="regPass">Passwort</label>
+              <input class="tf" id="regPass" type="password" autocomplete="new-password" placeholder="Mindestens 8 Zeichen">
+            </div>
+            <div>
+              <label class="tflabel" for="regPass2">Passwort bestätigen</label>
+              <input class="tf" id="regPass2" type="password" autocomplete="new-password" placeholder="Passwort wiederholen">
+            </div>
+            <p class="addrnote" id="regHint" hidden style="color:var(--no)"><span aria-hidden="true">⚠️</span><span>Die Passwörter stimmen nicht überein.</span></p>
+          </div>
+        </div>
+        <div class="obbottom">
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost" type="button" data-back style="width:auto;padding:0 22px">Zurück</button>
+            <button class="btn" type="button" id="regNext" data-go="onb2" disabled style="flex:1">Weiter</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ONBOARDING 2 : location -->
+      <section class="scrn" id="onb2" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="apphd"><span class="ttl">Wähle deine Zugehörigkeit</span></div>
+        <div class="obfixed">
+          <div class="steps"><i class="done"></i><i class="done"></i><i></i></div>
+          <div class="addr">
+            <span class="si" aria-hidden="true">🔍</span>
+            <input id="addrInput" type="text" autocomplete="off" placeholder="Adresse, PLZ oder Stadt" aria-label="Adresse, PLZ oder Stadt eingeben">
+            <button class="gps" id="gpsBtn" type="button" aria-label="Meinen Standort verwenden">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <div class="suggest" id="suggest"></div>
+          <p class="addrnote"><span aria-hidden="true">🔒</span><span>Deine Adresse wird <b>nicht gespeichert</b> – sie dient nur zur Auswahl deiner Zugehörigkeit.</span></p>
+        </div>
+        <div class="obscroll" id="scopeList"></div>
+        <div class="obbottom">
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost" type="button" data-back style="width:auto;padding:0 22px">Zurück</button>
+            <button class="btn" type="button" id="toInterests" data-go="onb3" disabled style="flex:1">Weiter</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ONBOARDING 3 : interests -->
+      <section class="scrn" id="onb3" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="apphd"><span class="ttl">Deine Interessen</span></div>
+        <div class="obfixed">
+          <div class="steps"><i class="done"></i><i class="done"></i><i class="done"></i></div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1.1">Was interessiert dich politisch?</div>
+          <p class="obsub" style="margin-top:8px">Wähle deine Fachrichtungen – danach richtet sich dein Feed. Später jederzeit änderbar.</p>
+        </div>
+        <div class="intscroll" id="intGrid"></div>
+        <div class="obbottom">
+          <div class="intcount" id="intCount">Noch keine ausgewählt</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost" type="button" data-back style="width:auto;padding:0 22px">Zurück</button>
+            <button class="btn" type="button" id="onbDone" data-go="feed" disabled style="flex:1">Fertig</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEED -->
+      <section class="scrn" id="feed" data-tabbar="1" data-tab="feed">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="view" style="padding-top:0">
+          <div class="topbar">
+            <button class="searchmini" type="button" data-tab-to="discover"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Suchen</button>
+            <button class="back" type="button" data-filter aria-label="Filter"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="fbadge" id="filterBadge" aria-hidden="true"></span></button>
+          </div>
+          <div class="toptabs">
+            <button class="toptab on" type="button" data-filtertype="all">Beiträge</button>
+            <button class="toptab" type="button" data-filtertype="problem">Probleme</button>
+            <button class="toptab" type="button" data-filtertype="idee">Ideen</button>
+            <button class="toptab" type="button" data-filtertype="diskussion">Diskussionen</button>
+            <button class="toptab" type="button" data-filtertype="umfrage">Umfragen</button>
+          </div>
+          <!-- Typ: Umfrage -->
+          <article class="post" data-type="umfrage">
+            <div class="post-av"><span class="avatar g2" aria-hidden="true">SM</span></div>
+            <div class="post-main">
+              <div class="post-head"><b>Stadtrat München</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@muenchen · 2 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+              <button class="post-clip" type="button" data-go="antrag">
+                <div class="post-text">Live-Abstimmung läuft: Tempo 30 auf der Lindwurmstraße zwischen Goetheplatz und Sendlinger Tor.</div>
+                <div class="poll">
+                  <div class="pollrow win"><span class="pfill" style="width:58%"></span><span class="plabel">Pro</span><span class="ppct">58%</span></div>
+                  <div class="pollrow"><span class="pfill" style="width:14%"></span><span class="plabel">Enthalten</span><span class="ppct">14%</span></div>
+                  <div class="pollrow"><span class="pfill" style="width:28%"></span><span class="plabel">Contra</span><span class="ppct">28%</span></div>
+                </div>
+                <div class="quorum"><span>Quorum <b>72%</b> · endet in 2 Tagen</span><span><b>1.284</b> Stimmen</span></div>
+              </button>
+              <div class="post-actions" data-c="34" data-r="12" data-l="248" data-v="8,4k"></div>
+            </div>
+          </article>
+
+          <!-- Typ: Problem -->
+          <article class="post" data-type="problem">
+            <div class="post-av"><span class="avatar" aria-hidden="true">JD</span></div>
+            <div class="post-main">
+              <div class="post-head"><b>Jonas Degen</b><span class="muted">@jonas · 3 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+              <button class="post-clip" type="button" data-go="diskussion">
+                <div class="post-text">Endlich Bewegung! Auf der Lindwurmstraße ist es für Anwohner viel zu laut. <span class="mention">@Stadtrat</span> Tempo 30 ist ein guter erster Schritt – aber wir brauchen auch bauliche Maßnahmen.</div>
+              </button>
+              <div class="post-actions" data-c="18" data-r="4" data-l="86" data-v="3,1k"></div>
+            </div>
+          </article>
+
+          <!-- Typ: Idee -->
+          <article class="post" data-type="idee">
+            <div class="post-av"><span class="avatar g3" aria-hidden="true">MP</span></div>
+            <div class="post-main">
+              <div class="post-head"><b>Dr. M. Prieler</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@planung · 5 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+              <button class="post-clip" type="button" data-go="diskussion">
+                <div class="post-text">Vorher / Nachher – so könnte die Fahrradstraße Isarvorstadt aussehen. Was meint ihr?</div>
+                <div class="media"><div class="media-grid"><span class="ph a" aria-hidden="true"></span><span class="ph b" aria-hidden="true"></span></div></div>
+              </button>
+              <div class="post-actions" data-c="42" data-r="9" data-l="312" data-v="12k"></div>
+            </div>
+          </article>
+
+          <!-- Typ: Beitrag (Video) -->
+          <article class="post" data-type="beitrag">
+            <div class="post-av"><span class="avatar g2" aria-hidden="true">GR</span></div>
+            <div class="post-main">
+              <div class="post-head"><b>AK Grünflächen</b><span class="muted">@gruen · 8 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+              <button class="post-clip" type="button" data-toast="Video abspielen">
+                <div class="post-text">Kurzer Clip vom Vor-Ort-Termin an den geplanten Trinkbrunnen-Standorten.</div>
+                <div class="video"><span class="ph" aria-hidden="true"></span><span class="playbtn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg></span><span class="dur">0:48</span></div>
+              </button>
+              <div class="post-actions" data-c="12" data-r="6" data-l="140" data-v="22k"></div>
+            </div>
+          </article>
+
+          <!-- Typ: Diskussion (Zitat) -->
+          <article class="post" data-type="diskussion">
+            <div class="post-av"><span class="avatar g3" aria-hidden="true">SK</span></div>
+            <div class="post-main">
+              <div class="post-head"><b>Sara Kern</b><span class="muted">@sara · 12 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+              <button class="post-clip" type="button" data-go="diskussion">
+                <div class="post-text">Reicht Tempo 30 oder braucht es Poller? Lasst es uns in der Diskussion klären.</div>
+                <div class="quote">
+                  <div class="quote-head"><span class="avatar" aria-hidden="true">JD</span><b>Jonas Degen</b><span class="muted">@jonas</span></div>
+                  <div class="quote-body">…Tempo 30 ist ein guter erster Schritt – aber wir brauchen auch bauliche Maßnahmen.</div>
+                </div>
+              </button>
+              <div class="post-actions" data-c="34" data-r="8" data-l="57" data-v="4,0k"></div>
+            </div>
+          </article>
+
+          <!-- Typ: Beitrag (Verlinkung / Referenz) -->
+          <article class="post" data-type="beitrag">
+            <div class="post-av"><span class="avatar" aria-hidden="true">UR</span></div>
+            <div class="post-main">
+              <div class="post-head"><b>Umweltreferat</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@umwelt · 1 Tag</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+              <button class="post-clip" type="button" data-toast="Quelle öffnen">
+                <div class="post-text">Unser Lärmgutachten 2025 belegt: Tempo 30 senkt den Straßenlärm um bis zu 3 dB.</div>
+                <div class="linkcard">
+                  <span class="ph a" aria-hidden="true"></span>
+                  <div class="lk-meta"><div class="lk-dom">muenchen.de</div><div class="lk-title">Lärmgutachten Lindwurmstraße 2025</div><div class="lk-desc">PDF · 24 Seiten · Referat für Klima- und Umweltschutz</div></div>
+                </div>
+              </button>
+              <div class="post-actions" data-c="21" data-r="15" data-l="190" data-v="9,7k"></div>
+            </div>
+          </article>
+        </div>
+        <nav class="tabbar" aria-label="Hauptnavigation"></nav>
+      </section>
+
+      <!-- DISCOVER -->
+      <section class="scrn" id="discover" data-tabbar="1" data-tab="discover">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="view">
+          <div class="greet" style="margin-top:10px">Entdecken</div>
+          <div class="searchbar"><span aria-hidden="true">🔍</span> Themen, Beiträge, Menschen …</div>
+          <div class="typefilter" id="searchScope"></div>
+          <div class="typefilter" id="searchTypes"></div>
+          <div class="typefilter" id="searchCats"></div>
+          <div style="font-size:12px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-top:18px">Gerade aktiv in München</div>
+          <div class="trend"><span class="rank">1</span><div style="flex:1"><div class="t">#Tempo30</div><div class="s">1.284 Stimmen · endet bald</div></div><span aria-hidden="true">📈</span></div>
+          <div class="trend"><span class="rank">2</span><div style="flex:1"><div class="t">#Radwege</div><div class="s">6 offene Anträge</div></div></div>
+          <div class="trend"><span class="rank">3</span><div style="flex:1"><div class="t">#Schulessen</div><div class="s">2 Diskussionen</div></div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-top:18px">Organisationen</div>
+          <button class="card" type="button" data-toast="Folgst jetzt „AK Mobilität“">
+            <div class="meta"><span class="avatar g2" aria-hidden="true">AM</span><span>Arbeitskreis · 340 Mitglieder</span></div>
+            <h3>AK Mobilität München</h3>
+            <p class="excerpt">Sichere Radwege &amp; ÖPNV für alle.</p>
+          </button>
+        </div>
+        <nav class="tabbar" aria-label="Hauptnavigation"></nav>
+      </section>
+
+      <!-- VOTES -->
+      <section class="scrn" id="votes" data-tabbar="1" data-tab="votes">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="view" style="padding-top:0">
+          <div class="topbar"><div class="tt">Abstimmungen<small>München &amp; Bayern</small></div></div>
+          <div class="toptabs">
+            <button class="toptab on" type="button">Offen</button>
+            <button class="toptab" type="button">Beendet</button>
+          </div>
+          <button class="card" type="button" data-go="antrag">
+            <div class="meta"><span class="tag live">Offen</span><span>· 2 Tg 4 Std</span></div>
+            <h3>Tempo 30 auf der Lindwurmstraße</h3>
+            <div class="poll">
+              <div class="pollrow win"><span class="pfill" style="width:58%"></span><span class="plabel">Pro</span><span class="ppct">58%</span></div>
+              <div class="pollrow"><span class="pfill" style="width:14%"></span><span class="plabel">Enthalten</span><span class="ppct">14%</span></div>
+              <div class="pollrow"><span class="pfill" style="width:28%"></span><span class="plabel">Contra</span><span class="ppct">28%</span></div>
+            </div>
+            <div class="quorum"><span>Quorum <b>72%</b></span><span><b>1.284</b> Stimmen</span></div>
+          </button>
+          <button class="card" type="button" data-go="antrag">
+            <div class="meta"><span class="tag live">Offen</span><span>· 5 Tage</span></div>
+            <h3>Fahrradstraße Isarvorstadt</h3>
+            <div class="poll">
+              <div class="pollrow win"><span class="pfill" style="width:41%"></span><span class="plabel">Pro</span><span class="ppct">41%</span></div>
+              <div class="pollrow"><span class="pfill" style="width:20%"></span><span class="plabel">Enthalten</span><span class="ppct">20%</span></div>
+              <div class="pollrow"><span class="pfill" style="width:39%"></span><span class="plabel">Contra</span><span class="ppct">39%</span></div>
+            </div>
+            <div class="quorum"><span>Quorum <b>48%</b></span><span><b>612</b> Stimmen</span></div>
+          </button>
+          <button class="card" type="button" data-toast="Abstimmung beendet">
+            <div class="meta"><span class="tag disc">Beendet</span><span>· angenommen</span></div>
+            <h3>Mehr Sitzbänke im Westpark</h3>
+            <div class="poll">
+              <div class="pollrow win"><span class="pfill" style="width:74%"></span><span class="plabel">Pro</span><span class="ppct">74%</span></div>
+              <div class="pollrow"><span class="pfill" style="width:9%"></span><span class="plabel">Enthalten</span><span class="ppct">9%</span></div>
+              <div class="pollrow"><span class="pfill" style="width:17%"></span><span class="plabel">Contra</span><span class="ppct">17%</span></div>
+            </div>
+          </button>
+        </div>
+        <nav class="tabbar" aria-label="Hauptnavigation"></nav>
+      </section>
+
+      <!-- MEINE BEITRÄGE -->
+      <section class="scrn" id="mine" data-tabbar="1" data-tab="mine">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="view" style="padding-top:0">
+          <div class="topbar"><div class="tt">Meine</div></div>
+          <div class="toptabs" data-tabs>
+            <button class="toptab on" type="button" data-panel="mine-posts">Beiträge</button>
+            <button class="toptab" type="button" data-panel="mine-replies">Antworten</button>
+            <button class="toptab" type="button" data-panel="mine-saved">Gespeichert</button>
+            <button class="toptab" type="button" data-panel="mine-votes">Abstimmungen</button>
+          </div>
+
+          <div class="panel" id="mine-posts">
+            <article class="post" data-type="diskussion">
+              <div class="post-av"><span class="avatar lg" aria-hidden="true">LK</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Lena Krause</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@lena · 3 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-go="diskussion">
+                  <div class="post-text">Sichere Schulwege fangen bei Tempo 30 an. Wer kommt Donnerstag zum Vor-Ort-Termin an der Grundschule?</div>
+                </button>
+                <div class="post-actions" data-c="16" data-r="7" data-l="94" data-v="2,3k"></div>
+              </div>
+            </article>
+            <article class="post" data-type="beitrag">
+              <div class="post-av"><span class="avatar lg" aria-hidden="true">LK</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Lena Krause</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@lena · 2 Tage</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-toast="Beitrag öffnen">
+                  <div class="post-text">Danke an alle 1.284, die bei Tempo 30 mitgestimmt haben. So sieht Beteiligung aus.</div>
+                  <div class="media"><div class="media-grid"><span class="ph a" aria-hidden="true"></span><span class="ph b" aria-hidden="true"></span></div></div>
+                </button>
+                <div class="post-actions" data-c="24" data-r="11" data-l="203" data-v="7,1k"></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="panel" id="mine-replies" hidden>
+            <article class="post">
+              <div class="post-av"><span class="avatar lg" aria-hidden="true">LK</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Lena Krause</b><span class="muted">@lena · antwortete @jonas · 5 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-go="diskussion">
+                  <div class="post-text"><span class="mention">@jonas</span> Genau – Poller an den Kreuzungen wären der nächste Schritt. Hast du dafür schon einen Antrag?</div>
+                </button>
+                <div class="post-actions" data-c="4" data-r="1" data-l="28" data-v="640"></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="panel" id="mine-saved" hidden>
+            <article class="post" data-type="umfrage">
+              <div class="post-av"><span class="avatar g2" aria-hidden="true">SM</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Stadtrat München</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@muenchen · 2 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-go="antrag">
+                  <div class="post-text">Live-Abstimmung: Tempo 30 auf der Lindwurmstraße. Endet in 2 Tagen.</div>
+                </button>
+                <div class="post-actions" data-c="34" data-r="12" data-l="248" data-v="8,4k"></div>
+              </div>
+            </article>
+            <article class="post" data-type="beitrag">
+              <div class="post-av"><span class="avatar" aria-hidden="true">UR</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Umweltreferat</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@umwelt · 1 Tag</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-toast="Quelle öffnen">
+                  <div class="post-text">Lärmgutachten 2025: Tempo 30 senkt den Straßenlärm um bis zu 3 dB.</div>
+                  <div class="linkcard"><span class="ph a" aria-hidden="true"></span><div class="lk-meta"><div class="lk-dom">muenchen.de</div><div class="lk-title">Lärmgutachten Lindwurmstraße 2025</div><div class="lk-desc">PDF · 24 Seiten</div></div></div>
+                </button>
+                <div class="post-actions" data-c="21" data-r="15" data-l="190" data-v="9,7k"></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="panel" id="mine-votes" hidden>
+            <button class="card" type="button" data-go="antrag">
+              <div class="meta"><span class="tag disc">Abgestimmt</span><span>· vor 3 Std</span></div>
+              <h3 style="font-size:14.5px">Stimmte <b style="color:var(--yes)">Pro</b> · Tempo 30 Lindwurmstr.</h3>
+            </button>
+            <button class="card" type="button" data-toast="Abstimmung beendet">
+              <div class="meta"><span class="tag disc">Abgestimmt</span><span>· letzte Woche</span></div>
+              <h3 style="font-size:14.5px">Stimmte <b style="color:var(--yes)">Pro</b> · Mehr Sitzbänke im Westpark</h3>
+            </button>
+          </div>
+        </div>
+        <nav class="tabbar" aria-label="Hauptnavigation"></nav>
+      </section>
+
+      <!-- BENACHRICHTIGUNGEN -->
+      <section class="scrn" id="notif" data-tabbar="1" data-tab="notif">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="view" style="padding-top:0">
+          <div class="topbar"><div class="tt">Benachrichtigungen</div></div>
+          <div class="toptabs" data-tabs>
+            <button class="toptab on" type="button" data-panel="noti-all">Alle</button>
+            <button class="toptab" type="button" data-panel="noti-mention">Erwähnungen</button>
+          </div>
+
+          <div class="panel" id="noti-all">
+            <button class="noti unread" type="button" data-go="antrag">
+              <span class="noti-ic like" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.3l-1.4-1.3C5.4 14.4 2 11.3 2 7.6 2 4.9 4.1 3 6.7 3c1.5 0 2.9.7 3.8 1.8L12 6l1.5-1.2A5 5 0 0117.3 3C19.9 3 22 4.9 22 7.6c0 3.7-3.4 6.8-8.6 11.4L12 20.3z"/></svg></span>
+              <span class="noti-tx"><b>Jonas Degen</b> und 86 weitere gefällt dein Beitrag zu <b>Tempo 30</b>.<span class="noti-t">2 Std</span></span>
+            </button>
+            <button class="noti unread" type="button" data-go="diskussion">
+              <span class="noti-ic reply" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-8.5 8.3 9 9 0 01-3.9-.9L3 20l1.3-4a8 8 0 01-1-3.9A8.4 8.4 0 0121 11.5z"/></svg></span>
+              <span class="noti-tx"><b>Sara Kern</b> hat auf deinen Kommentar geantwortet.<span class="noti-t">4 Std</span></span>
+            </button>
+            <button class="noti" type="button" data-toast="Profil öffnen">
+              <span class="noti-ic follow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M19 8v6M22 11h-6"/></svg></span>
+              <span class="noti-tx"><b>AK Mobilität München</b> folgt dir jetzt.<span class="noti-t">1 Tag</span></span>
+            </button>
+            <button class="noti" type="button" data-go="antrag">
+              <span class="noti-ic vote" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg></span>
+              <span class="noti-tx">Abstimmung <b>Fahrradstraße Isarvorstadt</b> endet in 2 Tagen.<span class="noti-t">1 Tag</span></span>
+            </button>
+          </div>
+
+          <div class="panel" id="noti-mention" hidden>
+            <button class="noti unread" type="button" data-go="diskussion">
+              <span class="noti-ic mention" aria-hidden="true">@</span>
+              <span class="noti-tx"><b>Jonas Degen</b> hat dich erwähnt: „…<span class="mention">@lena</span> hat den Termin organisiert."<span class="noti-t">6 Std</span></span>
+            </button>
+          </div>
+        </div>
+        <nav class="tabbar" aria-label="Hauptnavigation"></nav>
+      </section>
+
+      <!-- PROFILE -->
+      <section class="scrn" id="profile" data-tabbar="1" data-tab="profile">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="view">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;gap:10px">
+            <button class="acctchip" type="button" data-accounts aria-label="Konto wechseln">
+              <span class="av" data-acct-av aria-hidden="true">LK</span><span data-acct-name>Lena Krause</span><span class="cx" aria-hidden="true">▾</span>
+            </button>
+            <button class="back" type="button" data-go="settings" aria-label="Einstellungen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19.4 13.5a7.9 7.9 0 000-3l1.7-1.3-1.8-3.1-2 .8a7.6 7.6 0 00-2.6-1.5L12.9 2h-1.8l-.4 2.4a7.6 7.6 0 00-2.6 1.5l-2-.8-1.8 3.1L6 10.5a7.9 7.9 0 000 3l-1.7 1.3 1.8 3.1 2-.8a7.6 7.6 0 002.6 1.5l.4 2.4h1.8l.4-2.4a7.6 7.6 0 002.6-1.5l2 .8 1.8-3.1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></button>
+          </div>
+          <div class="phead">
+            <div class="pavatar" aria-hidden="true">LK</div>
+            <div class="pname">Lena Krause
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="phandle">@lena · München, Bayern</div>
+            <p class="pbio">Radfahrerin, Elternbeirätin. Für lebenswerte Stadt &amp; sichere Schulwege.</p>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="n">128</div><div class="l">Folgt</div></div>
+            <div class="stat"><div class="n">1.9k</div><div class="l">Follower</div></div>
+            <div class="stat"><div class="n">47</div><div class="l">Beiträge</div></div>
+          </div>
+          <div class="toptabs" data-tabs style="margin-top:14px">
+            <button class="toptab on" type="button" data-panel="profile-about">Profil</button>
+            <button class="toptab" type="button" data-panel="profile-activity">Aktivitäten</button>
+            <button class="toptab" type="button" data-panel="profile-privacy">Datenschutz</button>
+          </div>
+
+          <div class="panel" id="profile-about">
+            <div class="scopehd" style="margin-top:14px">Deine Ebenen &amp; Interessen</div>
+            <div class="scopes" style="margin-top:10px"><span class="scope">🏛️ Bund</span><span class="scope">🗺️ Bayern</span><span class="scope">📍 München</span><span class="scope">🚲 Mobilität</span><span class="scope">🌱 Klima</span></div>
+            <div style="margin-top:16px">
+              <button class="btn sm ghost" type="button" data-toast="Profil-Editor kommt bald">Profil bearbeiten</button>
+            </div>
+          </div>
+
+          <div class="panel" id="profile-activity" hidden>
+            <button class="card" type="button" data-go="antrag">
+              <div class="meta"><span class="tag disc">Aktivität</span><span>· vor 3 Std</span></div>
+              <h3 style="font-size:14.5px">Stimmte <b style="color:var(--yes)">Pro</b> · Tempo 30 Lindwurmstr.</h3>
+            </button>
+            <button class="card" type="button" data-go="diskussion">
+              <div class="meta"><span class="tag disc">Aktivität</span><span>· vor 5 Std</span></div>
+              <h3 style="font-size:14.5px">Kommentierte in <b>Reicht Tempo 30 oder braucht es Poller?</b></h3>
+            </button>
+            <button class="card" type="button" data-toast="Beitrag öffnen">
+              <div class="meta"><span class="tag disc">Aktivität</span><span>· gestern</span></div>
+              <h3 style="font-size:14.5px">Folgt jetzt <b>AK Mobilität München</b></h3>
+            </button>
+          </div>
+
+          <div class="panel" id="profile-privacy" hidden>
+            <div class="scopehd" style="margin-top:14px">Wer sieht dein Profil?</div>
+            <div class="visList"></div>
+            <div class="scopehd">Datenfreigabe</div>
+            <div class="scopesub">Du entscheidest, was öffentlich sichtbar ist.</div>
+            <div class="dataToggles"></div>
+            <div style="margin-top:16px;display:flex;gap:10px">
+              <button class="btn sm" type="button" data-toast="Datenschutz gespeichert">Speichern</button>
+              <button class="btn sm ghost" type="button" data-toast="Datenschutzerklärung öffnen">Datenschutzerklärung</button>
+            </div>
+          </div>
+        </div>
+        <nav class="tabbar" aria-label="Hauptnavigation"></nav>
+      </section>
+
+      <!-- ANTRAG detail -->
+      <section class="scrn" id="antrag" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="apphd"><button class="back" type="button" data-back aria-label="Zurück">‹</button><span class="ttl">Antrag · A-2026/084</span><span class="spacer"></span><button class="back" type="button" data-toast="Link kopiert" aria-label="Teilen">↗</button></div>
+        <div class="view">
+          <!-- AuthorHeader -->
+          <div class="ah">
+            <span class="avatar g2" aria-hidden="true">SM</span>
+            <div class="ah-id">
+              <div class="ah-name">Stadtrat München</div>
+              <div class="ah-sub"><small>@muenchen</small><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋮</button>
+          </div>
+
+          <!-- Content -->
+          <div style="margin-top:12px"><span class="ptype t-umfrage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V4M18 20v-6"/></svg><span>Umfrage</span></span></div>
+          <div class="detail-title">Tempo 30 auf der Lindwurmstraße</div>
+          <div class="detail-body">Zur Senkung von Lärm und Unfallrisiko soll auf dem Abschnitt zwischen Goetheplatz und Sendlinger Tor Tempo 30 gelten.</div>
+
+          <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--ink-3);margin-top:14px">
+            <span id="vote-hint">Deine Stimme</span><span>endet in 2 Tg 4 Std</span>
+          </div>
+          <div class="poll" id="pollBox"></div>
+          <div class="quorum"><span>Quorum <b>72%</b> · 1.000 nötig</span><span><b id="total">1.284</b> Stimmen</span></div>
+          <button class="btn sm" type="button" id="confirmVote" disabled style="margin-top:12px">Stimme bestätigen</button>
+
+          <!-- Quellen / Anhänge (Accordion, eingeklappt) -->
+          <div class="attach">
+            <button class="attach-toggle" type="button" data-accordion aria-expanded="false">
+              <span>Quellen &amp; Anhänge</span><span class="attach-count">2</span><span class="attach-chev" aria-hidden="true">▾</span>
+            </button>
+            <div class="attach-body" hidden>
+              <button class="attach-item" type="button" data-toast="PDF öffnen"><span class="attach-ic" aria-hidden="true">📄</span><span class="attach-tx"><span class="t">Lärmgutachten 2025</span><span class="s">PDF · 24 Seiten</span></span><span class="x" data-toast="Quelle entfernt" aria-label="Entfernen">✕</span></button>
+              <button class="attach-item" type="button" data-toast="Link öffnen"><span class="attach-ic" aria-hidden="true">🔗</span><span class="attach-tx"><span class="t">Studie Tempo 30 – Umweltbundesamt</span><span class="s">umweltbundesamt.de</span></span><span class="x" data-toast="Quelle entfernt" aria-label="Entfernen">✕</span></button>
+              <button class="attach-add" type="button" data-toast="Quelle hinzufügen"><span aria-hidden="true">＋</span> Quelle hinzufügen</button>
+            </div>
+          </div>
+
+          <!-- DateTime & co -->
+          <div class="detail-time">14:23 · 26. Aug. 2026 · <b>8.437</b> Aufrufe</div>
+
+          <!-- Actions -->
+          <div class="post-actions detail-actions" data-c="34" data-r="12" data-l="248"></div>
+
+          <!-- Kommentare -->
+          <div class="detail-comments">
+            <div class="dc-compose"><span class="avatar" aria-hidden="true">LK</span><div class="fake-input" data-toast="Kommentar schreiben">Kommentar schreiben …</div></div>
+            <article class="post">
+              <div class="post-av"><span class="avatar" aria-hidden="true">JD</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Jonas Degen</b><span class="muted">@jonas · 3 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-toast="Beitrag öffnen"><div class="post-text">Guter Schritt! Aber ohne bauliche Maßnahmen halten sich viele nicht dran.</div></button>
+                <div class="post-actions" data-c="6" data-r="1" data-l="28"></div>
+              </div>
+            </article>
+            <article class="post">
+              <div class="post-av"><span class="avatar g3" aria-hidden="true">MP</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Dr. M. Prieler</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@planung · 2 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-toast="Beitrag öffnen"><div class="post-text">Studien zeigen: Tempo 30 senkt den Lärm um ~3 dB. Poller wären ein separater Antrag.</div></button>
+                <div class="post-actions" data-c="9" data-r="3" data-l="41"></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- DISKUSSION -->
+      <section class="scrn" id="diskussion" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="apphd"><button class="back" type="button" data-back aria-label="Zurück">‹</button><span class="ttl">Diskussion</span></div>
+        <div class="view">
+          <!-- AuthorHeader -->
+          <div class="ah">
+            <span class="avatar g3" aria-hidden="true">SK</span>
+            <div class="ah-id"><div class="ah-name">Sara Kern</div><div class="ah-sub"><small>@sara</small></div></div>
+            <button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋮</button>
+          </div>
+
+          <!-- Content -->
+          <div style="margin-top:12px"><span class="ptype t-diskussion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M21 11.5a8 8 0 01-11.5 7.2L4 20l1.3-4A8 8 0 1121 11.5z"/></svg><span>Diskussion</span></span></div>
+          <div class="detail-title">Reicht Tempo 30 oder braucht es Poller?</div>
+          <div class="detail-body">Tempo 30 ist beschlossen – aber reicht das für spürbar weniger Verkehr? Oder brauchen wir bauliche Maßnahmen wie Poller? Sammeln wir Argumente.</div>
+
+          <!-- Quellen / Anhänge (Accordion) -->
+          <div class="attach">
+            <button class="attach-toggle" type="button" data-accordion aria-expanded="false">
+              <span>Quellen &amp; Anhänge</span><span class="attach-count">1</span><span class="attach-chev" aria-hidden="true">▾</span>
+            </button>
+            <div class="attach-body" hidden>
+              <button class="attach-item" type="button" data-toast="Link öffnen"><span class="attach-ic" aria-hidden="true">🔗</span><span class="attach-tx"><span class="t">Verkehrsberuhigung – ADFC München</span><span class="s">adfc-muenchen.de</span></span><span class="x" data-toast="Quelle entfernt" aria-label="Entfernen">✕</span></button>
+              <button class="attach-add" type="button" data-toast="Quelle hinzufügen"><span aria-hidden="true">＋</span> Quelle hinzufügen</button>
+            </div>
+          </div>
+
+          <!-- DateTime & co -->
+          <div class="detail-time">10:05 · 26. Aug. 2026 · <b>4.021</b> Aufrufe</div>
+
+          <!-- Actions -->
+          <div class="post-actions detail-actions" data-c="34" data-r="8" data-l="57"></div>
+
+          <!-- Kommentare -->
+          <div class="detail-comments">
+            <div class="dc-compose"><span class="avatar" aria-hidden="true">LK</span><div class="fake-input" data-toast="Antwort schreiben">Antwort schreiben …</div></div>
+            <article class="post">
+              <div class="post-av"><span class="avatar" aria-hidden="true">JD</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Jonas Degen</b><span class="muted">@jonas · Anwohner · 3 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-toast="Beitrag öffnen"><div class="post-text">Tempo 30 ist ein guter Anfang, aber ohne bauliche Maßnahmen halten sich viele nicht dran.</div></button>
+                <div class="post-actions" data-c="5" data-r="1" data-l="28"></div>
+              </div>
+            </article>
+            <article class="post">
+              <div class="post-av"><span class="avatar g3" aria-hidden="true">MP</span></div>
+              <div class="post-main">
+                <div class="post-head"><b>Dr. M. Prieler</b><svg class="vf" viewBox="0 0 24 24" fill="none" aria-label="verifiziert"><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.8-1 2.8 1 2.8-2.4 1.8-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15.5l1-2.8-1-2.8L5.6 8l1-2.8 3-.1z" fill="var(--brand)"/><path d="M8.5 12.2l2.3 2.3 4.5-4.7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="muted">@planung · 2 Std</span><button class="more" type="button" data-toast="Mehr" aria-label="Mehr">⋯</button></div>
+                <button class="post-clip" type="button" data-toast="Beitrag öffnen"><div class="post-text">Studien zeigen: Tempo 30 senkt den Lärm um ~3 dB. Poller wären ein separater Antrag.</div></button>
+                <div class="post-actions" data-c="9" data-r="3" data-l="41"></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="scrn" id="settings" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="apphd"><button class="back" type="button" data-back aria-label="Zurück">‹</button><span class="ttl">Einstellungen</span></div>
+        <div class="view">
+          <div style="display:flex;align-items:center;gap:12px;padding:4px 2px 2px">
+            <span class="avatar lg" aria-hidden="true">LK</span>
+            <div><div style="font-weight:700;font-size:15px">Lena Krause</div><div style="font-size:12.5px;color:var(--ink-3)">philipp.karlsson@gmail.com</div></div>
+          </div>
+
+          <div class="setgrp">Konto</div>
+          <div class="setlist">
+            <button class="setrow" type="button" data-toast="Profil-Editor kommt bald"><span class="ic" aria-hidden="true">✏️</span><span>Profil bearbeiten</span><span class="chev" aria-hidden="true">›</span></button>
+            <button class="setrow" type="button" data-go="privacy"><span class="ic" aria-hidden="true">🔒</span><span>Privatsphäre<span class="sub">Wer dein Profil &amp; deine Aktivität sieht</span></span><span class="chev" aria-hidden="true">›</span></button>
+            <button class="setrow" type="button" data-toast="Sprache & Region kommt bald"><span class="ic" aria-hidden="true">🌐</span><span>Sprache &amp; Region<span class="sub">Deutsch · Europe/Berlin</span></span><span class="chev" aria-hidden="true">›</span></button>
+            <button class="setrow" type="button" data-toast="Benachrichtigungen kommt bald"><span class="ic" aria-hidden="true">🔔</span><span>Benachrichtigungen</span><span class="chev" aria-hidden="true">›</span></button>
+          </div>
+
+          <div class="setgrp">Meine Daten &amp; Datenschutz</div>
+          <div class="setlist">
+            <button class="setrow" type="button" data-toast="Export wird vorbereitet – Link per E-Mail"><span class="ic" aria-hidden="true">⬇️</span><span>Meine Daten herunterladen<span class="sub">Alle deine Daten als Export (DSGVO Art. 20)</span></span><span class="chev" aria-hidden="true">›</span></button>
+            <button class="setrow" type="button" data-go="privacy"><span class="ic" aria-hidden="true">🛡️</span><span>Datenschutz-Einstellungen</span><span class="chev" aria-hidden="true">›</span></button>
+            <button class="setrow" type="button" data-toast="Datenschutzerklärung öffnen"><span class="ic" aria-hidden="true">📄</span><span>Datenschutzerklärung</span><span class="chev" aria-hidden="true">›</span></button>
+            <button class="setrow" type="button" data-toast="Impressum öffnen"><span class="ic" aria-hidden="true">ℹ️</span><span>Impressum</span><span class="chev" aria-hidden="true">›</span></button>
+          </div>
+
+          <div class="setgrp">Sitzung</div>
+          <div class="setlist">
+            <button class="setrow danger" type="button" data-logout><span class="ic" aria-hidden="true">⏻</span><span>Abmelden</span><span class="chev" aria-hidden="true">›</span></button>
+            <button class="setrow danger" type="button" data-delete><span class="ic" aria-hidden="true">🗑️</span><span>Konto löschen<span class="sub">Endgültig – deine Beiträge werden anonymisiert</span></span><span class="chev" aria-hidden="true">›</span></button>
+          </div>
+          <div style="height:12px"></div>
+        </div>
+      </section>
+
+      <!-- PRIVACY -->
+      <section class="scrn" id="privacy" data-tabbar="0">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="apphd"><button class="back" type="button" data-back aria-label="Zurück">‹</button><span class="ttl">Privatsphäre</span></div>
+        <div class="view">
+          <div class="scopehd" style="margin-top:8px">Wer sieht dein Profil?</div>
+          <div class="visList"></div>
+          <div class="scopehd">Datenfreigabe</div>
+          <div class="scopesub">Du entscheidest, was öffentlich sichtbar ist.</div>
+          <div class="dataToggles"></div>
+          <div style="margin-top:18px"><button class="btn sm" type="button" data-toast="Datenschutz gespeichert">Speichern</button></div>
+        </div>
+      </section>
+
+      <!-- overlays -->
+      <div class="sheet-bg" id="sheetBg"></div>
+      <div class="sheet" id="sheet"><div class="grip" aria-hidden="true"></div><h4 id="sheetTitle">Auswählen</h4><div id="sheetOpts"></div></div>
+      <div class="toast" id="toast"><span class="ck" aria-hidden="true">✓</span><span id="toastMsg">Gespeichert</span></div>
+    </div>
+  </div>
+
+  <p class="foot">Echter Clickdummy: Onboarding → App durchklicken, Tab-Bar wechseln, in Anträgen abstimmen. Liegt unter <code>docs/design/mockup/index.html</code>.</p>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var screenEl = document.getElementById('screen');
+
+  /* ---- theme ---- */
+  var tb = document.getElementById('themeBtn'), ti = document.getElementById('themeIcon'), tl = document.getElementById('themeLbl');
+  function isDark(){ var t = root.getAttribute('data-theme'); return t ? t==='dark' : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
+  function paintTheme(){ var d = isDark(); tl.textContent = d?'Light':'Dark'; ti.textContent = d?'☀':'◐'; tb.setAttribute('aria-pressed', String(d)); }
+  tb.addEventListener('click', function(){ root.setAttribute('data-theme', isDark()?'light':'dark'); paintTheme(); });
+  paintTheme();
+
+  /* ---- router ---- */
+  var stack = ['onb1'];
+  function current(){ return stack[stack.length-1]; }
+  function show(id){
+    var screens = screenEl.querySelectorAll('.scrn');
+    for (var i=0;i<screens.length;i++){ screens[i].classList.toggle('active', screens[i].id===id); }
+    var v = document.querySelector('#'+id+' .view'); if (v) v.scrollTop = 0;
+    closeSheet();
+  }
+  function go(id){ if(id===current())return; stack.push(id); show(id); }
+  function goTab(id){ stack = [id]; show(id); }        // tabs reset the stack
+  function back(){ if(stack.length>1){ stack.pop(); show(current()); } }
+
+  /* ---- content types: icon + colour, shown on every post ---- */
+  var TYPES = {
+    beitrag:    { label:'Beitrag',    cls:'t-beitrag',    hint:'Teile ein Update oder Info',       svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>' },
+    problem:    { label:'Problem',    cls:'t-problem',    hint:'Melde ein Problem in deinem Ort',    svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l9.5 16.5H2.5z"/><path d="M12 10v4M12 17h.01"/></svg>' },
+    idee:       { label:'Idee',       cls:'t-idee',       hint:'Bring einen Vorschlag ein',          svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-3.8 10.7c.5.4.8 1 .8 1.6v.2h6v-.2c0-.6.3-1.2.8-1.6A6 6 0 0012 3z"/></svg>' },
+    diskussion: { label:'Diskussion', cls:'t-diskussion', hint:'Starte ein Thema',                    svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M21 11.5a8 8 0 01-11.5 7.2L4 20l1.3-4A8 8 0 1121 11.5z"/></svg>' },
+    umfrage:    { label:'Umfrage',    cls:'t-umfrage',    hint:'Hol ein Stimmungsbild ein',          svg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V11M12 20V4M18 20v-6"/></svg>' }
+  };
+  function typeChip(k){ var t = TYPES[k]; if(!t) return null;
+    var s = document.createElement('span'); s.className = 'ptype ' + t.cls;
+    s.innerHTML = t.svg + '<span>' + t.label + '</span>'; return s; }
+
+  /* ---- acting account: user vs. party vs. city → recolours header + nav ---- */
+  var ACCOUNTS = [
+    { id:'me',     role:'me',    nm:'Lena Krause',   sub:'Privat',                    av:'LK', avbg:'linear-gradient(135deg,var(--brand),#9a86ff)' },
+    { id:'gruene', role:'party', nm:'Grüne München', sub:'Partei · Kreisverband',     av:'GM', avbg:'#2e8b57' },
+    { id:'stadt',  role:'city',  nm:'Stadt München', sub:'Amtlich · Referat Mobilität', av:'M', avbg:'#2f6fb0' }
+  ];
+  var currentAccount = ACCOUNTS[0];
+  function setAccount(a){
+    currentAccount = a;
+    screenEl.setAttribute('data-role', a.role);
+    document.querySelectorAll('.tab .tav').forEach(function(av){ av.textContent = a.av; av.style.background = a.avbg; });
+    document.querySelectorAll('[data-acct-name]').forEach(function(el){ el.textContent = a.nm; });
+    document.querySelectorAll('[data-acct-av]').forEach(function(el){ el.textContent = a.av; el.style.background = a.avbg; });
+  }
+  function openAccounts(){
+    sheetTitle.textContent = 'Konto wechseln'; sheetOpts.innerHTML = '';
+    ACCOUNTS.forEach(function(a){
+      var b = document.createElement('button'); b.type='button'; b.className='opt';
+      b.innerHTML = '<span style="display:flex;gap:12px;align-items:center">'+
+        '<span style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;background:'+a.avbg+'">'+a.av+'</span>'+
+        '<span><span style="display:block">'+a.nm+'</span><span style="display:block;font-size:12px;color:var(--ink-3);font-weight:500">'+a.sub+'</span></span></span>'+
+        (a.id===currentAccount.id ? '<span class="ic" aria-hidden="true">✓</span>' : '<span class="ic" aria-hidden="true">›</span>');
+      b.addEventListener('click', function(){ setAccount(a); closeSheet(); showToast('Aktiv als '+a.nm); });
+      sheetOpts.appendChild(b);
+    });
+    sheetBg.classList.add('open'); requestAnimationFrame(function(){ sheet.classList.add('open'); });
+  }
+
+  /* build tab bars */
+  var TABS = [
+    {id:'feed', label:'Start', icon:'<path d="M3 10.5L12 4l9 6.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z" fill="currentColor"/>'},
+    {id:'discover', label:'Suche', icon:'<circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'},
+    {id:'mine', label:'Meine', icon:'<path d="M6 3h12v18l-6-4.2L6 21z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>'},
+    {id:'notif', label:'Benachrichtigungen', icon:'<path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M10.5 20.5a2 2 0 003 0" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>'},
+    {id:'profile', label:'Profil', avatar:'LK'}
+  ];
+  document.querySelectorAll('.scrn[data-tab]').forEach(function(scr){
+    var bar = scr.querySelector('.tabbar');
+    var activeTab = scr.getAttribute('data-tab');
+    TABS.forEach(function(t){
+      var b = document.createElement('button'); b.type='button';
+      b.className = 'tab' + (t.id===activeTab ? ' on':''); b.setAttribute('data-tab-to', t.id);
+      b.setAttribute('aria-label', t.label);
+      if (t.avatar) b.innerHTML = '<span class="tav" aria-hidden="true">'+t.avatar+'</span>';
+      else b.innerHTML = '<svg viewBox="0 0 24 24" fill="none">'+t.icon+'</svg>';
+      bar.appendChild(b);
+    });
+    var fab = document.createElement('button'); fab.type='button'; fab.className='composefab';
+    fab.setAttribute('data-fab','1'); fab.setAttribute('aria-label','Neuer Beitrag');
+    fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>';
+    scr.appendChild(fab);
+  });
+
+  /* ---- shared overlay sheet ---- */
+  var sheetBg = document.getElementById('sheetBg'), sheet = document.getElementById('sheet');
+  var sheetTitle = document.getElementById('sheetTitle'), sheetOpts = document.getElementById('sheetOpts');
+  function openSheet(){ sheetBg.classList.add('open'); requestAnimationFrame(function(){ sheet.classList.add('open'); }); }
+  function closeSheet(){ sheet.classList.remove('open'); sheetBg.classList.remove('open'); }
+  sheetBg.addEventListener('click', closeSheet);
+
+  /* ---- post action rows (icon + count) ---- */
+  var ACT = {
+    reply: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-8.5 8.3 9 9 0 01-3.9-.9L3 20l1.3-4a8 8 0 01-1-3.9A8.4 8.4 0 0121 11.5z"/></svg>',
+    repost: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',
+    like: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.3l-1.4-1.3C5.4 14.4 2 11.3 2 7.6 2 4.9 4.1 3 6.7 3c1.5 0 2.9.7 3.8 1.8L12 6l1.5-1.2A5 5 0 0117.3 3C19.9 3 22 4.9 22 7.6c0 3.7-3.4 6.8-8.6 11.4L12 20.3z"/></svg>',
+    views: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V11M9 20V5M15 20v-6M21 20V8"/><path d="M2 20.5h20"/></svg>',
+    bookmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.2L6 21z"/></svg>',
+    share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.4"/><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="19" r="2.4"/><path d="M8.1 10.9l7.8-4.6M8.1 13.1l7.8 4.6"/></svg>'
+  };
+  function actBtn(type, count, label, cls, attr){
+    return '<button class="act ' + (cls || '') + '" type="button" aria-label="' + label + '"' + (attr || '') + '>' +
+      ACT[type] + (count ? '<span>' + count + '</span>' : '') + '</button>';
+  }
+  /* normalize posts into two-line AuthorHeader + full-width content */
+  document.querySelectorAll('.post').forEach(function(post){
+    var head = post.querySelector('.post-head'); if (!head) return;
+    var av = post.querySelector('.post-av');
+    var main = post.querySelector('.post-main');
+    var avatar = (av && av.querySelector('.avatar')) || head.querySelector('.avatar');
+    var name = head.querySelector('b');
+    var vf = head.querySelector('.vf');
+    var muted = head.querySelector('.muted');
+    var more = head.querySelector('.more');
+
+    var ah = document.createElement('div'); ah.className = 'ah';
+    if (avatar) ah.appendChild(avatar);
+    var id = document.createElement('div'); id.className = 'ah-id';
+    var nm = document.createElement('div'); nm.className = 'ah-name'; nm.textContent = name ? name.textContent : '';
+    var sub = document.createElement('div'); sub.className = 'ah-sub';
+    var small = document.createElement('small'); small.textContent = muted ? muted.textContent : '';
+    sub.appendChild(small);
+    if (vf) sub.appendChild(vf);
+    id.appendChild(nm); id.appendChild(sub);
+    ah.appendChild(id);
+    if (!more) { more = document.createElement('button'); more.type = 'button'; more.className = 'more'; more.setAttribute('data-toast', 'Mehr'); more.setAttribute('aria-label', 'Mehr'); }
+    more.textContent = '⋮';
+    ah.appendChild(more);
+
+    head.replaceWith(ah);
+    if (main) { while (main.firstChild) post.insertBefore(main.firstChild, main); main.remove(); }
+    if (av) av.remove();
+
+    var chip = typeChip(post.getAttribute('data-type'));
+    if (chip) post.insertBefore(chip, post.firstChild);
+
+    /* every post opens a detail view, like all others */
+    var clip = post.querySelector('.post-clip');
+    if (clip && !clip.hasAttribute('data-go')) {
+      clip.setAttribute('data-go', post.getAttribute('data-type') === 'umfrage' ? 'antrag' : 'diskussion');
+      clip.removeAttribute('data-toast');
+    }
+  });
+
+  document.querySelectorAll('.post-actions').forEach(function(row){
+    var c = row.getAttribute('data-c') || '', r = row.getAttribute('data-r') || '',
+        l = row.getAttribute('data-l') || '', v = row.getAttribute('data-v') || '';
+    row.innerHTML =
+      actBtn('reply', c, 'Kommentare', '', ' data-toast="Kommentare"') +
+      actBtn('repost', r, 'Zitieren', '', ' data-toast="Zitieren"') +
+      actBtn('like', l, 'Gefällt mir', 'act-like', ' data-like') +
+      actBtn('views', v, 'Aufrufe', '', ' data-toast="Aufrufe"') +
+      '<span class="act-spacer"></span>' +
+      actBtn('bookmark', '', 'Merken', '', ' data-toast="Gemerkt"') +
+      actBtn('share', '', 'Teilen', '', ' data-toast="Teilen"');
+  });
+  document.addEventListener('click', function(e){
+    var lk = e.target.closest('[data-like]'); if (!lk) return;
+    var span = lk.querySelector('span'); var on = lk.classList.toggle('on');
+    if (span){
+      if (span.getAttribute('data-base') === null) span.setAttribute('data-base', span.textContent);
+      var n = parseInt(span.getAttribute('data-base'), 10) || 0;
+      span.textContent = on ? (n + 1) : n;
+    }
+  });
+
+  /* ---- accordions (Quellen / Anhänge) ---- */
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-accordion]'); if (!t) return;
+    var open = t.getAttribute('aria-expanded') === 'true';
+    t.setAttribute('aria-expanded', String(!open));
+    var body = t.nextElementSibling;
+    if (body) body.hidden = open;
+  });
+
+  /* ---- underline top-tabs (visual switch) ---- */
+  document.addEventListener('click', function(e){
+    var tt = e.target.closest('.toptab');
+    if (!tt) return;
+    tt.parentElement.querySelectorAll('.toptab').forEach(function(x){ x.classList.remove('on'); });
+    tt.classList.add('on');
+    var scope = tt.closest('.view') || document;
+    var target = tt.getAttribute('data-panel');
+    if (target){
+      tt.parentElement.querySelectorAll('.toptab').forEach(function(x){
+        var p = x.getAttribute('data-panel'); if (!p) return;
+        var el = scope.querySelector('#'+p); if (el) el.hidden = (p !== target);
+      });
+    }
+    var ft = tt.getAttribute('data-filtertype');
+    if (ft){
+      scope.querySelectorAll('.post[data-type]').forEach(function(p){
+        p.style.display = (ft === 'all' || p.getAttribute('data-type') === ft) ? '' : 'none';
+      });
+    }
+  });
+
+  /* ---- home filter (region + categories) ---- */
+  // fl = Flaggen-Emoji als Platzhalter; im echten Frontend Wappen/SVG.
+  var REGION = [
+    { fl: '🌍', nm: 'International', on: false }, { fl: '🇪🇺', nm: 'EU', on: false },
+    { fl: '🇩🇪', nm: 'Deutschland', on: true }, { fl: '🏳️', nm: 'Bayern', on: true }, { fl: '📍', nm: 'Rosenheim', on: true }
+  ];
+  var CATS = [
+    { fl: '🚲', nm: 'Mobilität', on: true }, { fl: '🌱', nm: 'Klima', on: true }, { fl: '🎓', nm: 'Bildung', on: true },
+    { fl: '🏠', nm: 'Wohnen', on: false }, { fl: '🏥', nm: 'Gesundheit', on: false }, { fl: '💻', nm: 'Digitales', on: false },
+    { fl: '⚡', nm: 'Energie', on: false }, { fl: '🇪🇺', nm: 'Europa', on: false }
+  ];
+  function updateFilterBadge(){
+    var n = REGION.filter(function(r){ return r.on; }).length + CATS.filter(function(c){ return c.on; }).length;
+    var el = document.getElementById('filterBadge'); if (!el) return;
+    el.textContent = n; el.classList.toggle('show', n > 0);
+  }
+  function renderFchips(container, arr){
+    container.innerHTML = '';
+    arr.forEach(function(it){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'fchip ' + (it.on ? 'on' : 'off');
+      b.setAttribute('aria-pressed', String(it.on));
+      b.innerHTML = '<span class="fl" aria-hidden="true">' + it.fl + '</span><span>' + it.nm + '</span>' +
+        '<span class="x" aria-hidden="true">' + (it.on ? '✕' : '+') + '</span>';
+      b.addEventListener('click', function(){ it.on = !it.on; renderFchips(container, arr); updateFilterBadge(); });
+      container.appendChild(b);
+    });
+  }
+  function openFilter(){
+    sheetTitle.textContent = 'Filter';
+    sheetOpts.innerHTML = '';
+    var rh = document.createElement('div'); rh.className = 'scopehd'; rh.style.margin = '2px 2px 10px'; rh.textContent = 'Region';
+    var rw = document.createElement('div'); rw.className = 'fchips';
+    sheetOpts.appendChild(rh); sheetOpts.appendChild(rw); renderFchips(rw, REGION);
+    var ch = document.createElement('div'); ch.className = 'scopehd'; ch.style.margin = '18px 2px 2px'; ch.textContent = 'Kategorien';
+    var cs = document.createElement('div'); cs.className = 'scopesub'; cs.style.margin = '0 2px 10px'; cs.textContent = 'Standard: deine Interessen aus dem Profil.';
+    var cw = document.createElement('div'); cw.className = 'fchips';
+    sheetOpts.appendChild(ch); sheetOpts.appendChild(cs); sheetOpts.appendChild(cw); renderFchips(cw, CATS);
+    var apply = document.createElement('button'); apply.type = 'button'; apply.className = 'btn sm'; apply.style.marginTop = '18px'; apply.textContent = 'Anwenden';
+    apply.addEventListener('click', function(){ closeSheet(); showToast('Filter angewendet'); });
+    sheetOpts.appendChild(apply);
+    openSheet();
+  }
+
+  /* ---- register · account step ---- */
+  var regEmail = document.getElementById('regEmail');
+  var regPass = document.getElementById('regPass');
+  var regPass2 = document.getElementById('regPass2');
+  var regNext = document.getElementById('regNext');
+  var regHint = document.getElementById('regHint');
+  function validateReg(){
+    var emailOk = /\S+@\S+\.\S+/.test(regEmail.value.trim());
+    var passOk = regPass.value.length >= 8;
+    var mismatch = regPass2.value.length > 0 && regPass.value !== regPass2.value;
+    regHint.hidden = !mismatch;
+    regNext.disabled = !(emailOk && passOk && regPass2.value.length > 0 && !mismatch);
+  }
+  [regEmail, regPass, regPass2].forEach(function(el){ el.addEventListener('input', validateReg); });
+
+  /* ---- onboarding · location search ---- */
+  var PLACES = [
+    { label:'München', city:'München', land:'Bayern', kind:'Stadt' },
+    { label:'80331 München', city:'München', land:'Bayern', kind:'PLZ' },
+    { label:'Marienplatz 1, München', city:'München', land:'Bayern', kind:'Adresse' },
+    { label:'Nürnberg', city:'Nürnberg', land:'Bayern', kind:'Stadt' },
+    { label:'Berlin', city:'Berlin', land:'Berlin', kind:'Stadt' },
+    { label:'10115 Berlin', city:'Berlin', land:'Berlin', kind:'PLZ' },
+    { label:'Hamburg', city:'Hamburg', land:'Hamburg', kind:'Stadt' },
+    { label:'Köln', city:'Köln', land:'Nordrhein-Westfalen', kind:'Stadt' }
+  ];
+  var addrInput = document.getElementById('addrInput');
+  var suggestEl = document.getElementById('suggest');
+  var scopeList = document.getElementById('scopeList');
+  var scopeState = [];
+
+  function renderSuggest(){
+    var q = addrInput.value.trim().toLowerCase();
+    suggestEl.innerHTML = '';
+    if (!q) return;
+    var hits = PLACES.filter(function(p){ return p.label.toLowerCase().indexOf(q) > -1; }).slice(0, 5);
+    if (!hits.length) hits = [{ label: addrInput.value.trim(), city: addrInput.value.trim(), land: 'Bayern', kind: 'Adresse' }];
+    hits.forEach(function(p){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'sugg';
+      b.innerHTML = '<span aria-hidden="true">📍</span><span>' + p.label + '</span><span class="k">' + p.kind + '</span>';
+      b.addEventListener('click', function(){ resolveLocation(p); });
+      suggestEl.appendChild(b);
+    });
+  }
+  addrInput.addEventListener('input', renderSuggest);
+  document.getElementById('gpsBtn').addEventListener('click', function(){
+    resolveLocation({ label: 'Mein Standort · München', city: 'München', land: 'Bayern' });
+    showToast('Standort erkannt');
+  });
+
+  function resolveLocation(p){
+    addrInput.value = p.label;
+    suggestEl.innerHTML = '';
+    scopeState = [
+      { ic: '🌍', nm: 'International', lv: 'Weltweit', on: true },
+      { ic: '🇪🇺', nm: 'Europäische Union', lv: 'Union', on: true },
+      { ic: '🏛️', nm: 'Deutschland', lv: 'Land', on: true },
+      { ic: '🗺️', nm: p.land, lv: 'Bundesland', on: true },
+      { ic: '📍', nm: p.city, lv: 'Kommune', on: true }
+    ];
+    renderScopes();
+    document.getElementById('toInterests').disabled = false;
+    var fl = document.getElementById('feed-loc'); if (fl) fl.textContent = p.city + ' · ' + p.land;
+  }
+  function renderScopes(){
+    scopeList.innerHTML = '';
+    scopeState.forEach(function(s){
+      var b = document.createElement('button'); b.type = 'button';
+      b.className = 'scoperow' + (s.on ? ' on' : '') + (s.locked ? ' locked' : '');
+      b.setAttribute('aria-pressed', String(s.on));
+      b.innerHTML = '<span class="ic" aria-hidden="true">' + s.ic + '</span>' +
+        '<span><span class="nm">' + s.nm + '</span><span class="lv">' + s.lv + '</span></span>' +
+        '<span class="tog" aria-hidden="true">✓</span>';
+      if (!s.locked) b.addEventListener('click', function(){ s.on = !s.on; renderScopes(); });
+      scopeList.appendChild(b);
+    });
+  }
+
+  /* ---- onboarding · interests ---- */
+  var TOPICS = [
+    ['🚲','Mobilität & Verkehr'], ['🌱','Klima & Umwelt'], ['🎓','Bildung'], ['🏠','Wohnen & Mieten'],
+    ['🤝','Soziales'], ['🏥','Gesundheit'], ['💶','Finanzen & Steuern'], ['💻','Digitales'],
+    ['⚖️','Recht & Inneres'], ['🌍','Migration & Integration'], ['💼','Wirtschaft & Arbeit'], ['⚡','Energie'],
+    ['🇪🇺','Europa'], ['🌾','Landwirtschaft'], ['🌈','Gleichstellung'], ['🎭','Kultur']
+  ];
+  var intGrid = document.getElementById('intGrid');
+  var selInterests = 0;
+  TOPICS.forEach(function(t){
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'intchip'; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = '<span class="e" aria-hidden="true">' + t[0] + '</span>' + t[1];
+    b.addEventListener('click', function(){
+      var on = b.classList.toggle('on'); b.setAttribute('aria-pressed', String(on));
+      selInterests += on ? 1 : -1; updateInterests();
+    });
+    intGrid.appendChild(b);
+  });
+  function updateInterests(){
+    document.getElementById('intCount').textContent = selInterests ? selInterests + ' ausgewählt' : 'Noch keine ausgewählt';
+    document.getElementById('onbDone').disabled = selInterests === 0;
+  }
+
+  /* ---- privacy screen ---- */
+  var VIS = [
+    { ic:'🌐', nm:'Öffentlich', lv:'Für alle sichtbar', on:true },
+    { ic:'👥', nm:'Nur Follower', lv:'Nur wer dir folgt', on:false },
+    { ic:'🔒', nm:'Privat', lv:'Nur du', on:false }
+  ];
+  function renderVis(){
+    document.querySelectorAll('.visList').forEach(function(host){
+      host.innerHTML = '';
+      VIS.forEach(function(v, i){
+        var b = document.createElement('button'); b.type = 'button';
+        b.className = 'scoperow' + (v.on ? ' on' : '');
+        b.setAttribute('aria-pressed', String(v.on));
+        b.innerHTML = '<span class="ic" aria-hidden="true">' + v.ic + '</span>' +
+          '<span><span class="nm">' + v.nm + '</span><span class="lv">' + v.lv + '</span></span>' +
+          '<span class="tog" aria-hidden="true">✓</span>';
+        b.addEventListener('click', function(){ VIS.forEach(function(x, j){ x.on = j === i; }); renderVis(); });
+        host.appendChild(b);
+      });
+    });
+  }
+  renderVis();
+  var DATA = [
+    { nm:'Standort auf Profil zeigen', lv:'München, Bayern', on:true },
+    { nm:'Aktivität öffentlich', lv:'Abstimmungen & Beiträge', on:true },
+    { nm:'Über Suche auffindbar', lv:'Name & Handle', on:true }
+  ];
+  function renderData(){
+    document.querySelectorAll('.dataToggles').forEach(function(host){
+      host.innerHTML = '';
+      DATA.forEach(function(d){
+        var b = document.createElement('button'); b.type = 'button';
+        b.className = 'scoperow' + (d.on ? ' on' : '');
+        b.setAttribute('aria-pressed', String(d.on));
+        b.innerHTML = '<span><span class="nm">' + d.nm + '</span><span class="lv">' + d.lv + '</span></span>' +
+          '<span class="tog" aria-hidden="true">✓</span>';
+        b.addEventListener('click', function(){ d.on = !d.on; renderData(); });
+        host.appendChild(b);
+      });
+    });
+  }
+  renderData();
+
+  /* ---- account: logout & delete ---- */
+  function logout(){ stack = ['onb1']; show('onb1'); showToast('Abgemeldet'); }
+  function confirmDelete(){
+    sheetTitle.textContent = 'Konto wirklich löschen?';
+    sheetOpts.innerHTML =
+      '<p style="font-size:13px;color:var(--ink-2);margin:0 4px 12px;line-height:1.5">Dein Profil und deine persönlichen Daten werden endgültig gelöscht. Deine öffentlichen Beiträge bleiben anonymisiert erhalten.</p>';
+    var del = document.createElement('button'); del.type = 'button'; del.className = 'btn sm';
+    del.style.background = 'var(--no)'; del.textContent = 'Endgültig löschen';
+    del.addEventListener('click', function(){ closeSheet(); logout(); showToast('Konto gelöscht'); });
+    var cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'btn sm ghost';
+    cancel.style.marginTop = '8px'; cancel.textContent = 'Abbrechen';
+    cancel.addEventListener('click', closeSheet);
+    sheetOpts.appendChild(del); sheetOpts.appendChild(cancel);
+    openSheet();
+  }
+
+  /* ---- voting (X-style poll) ---- */
+  var base = { y:744, a:180, n:360 };
+  var POLL_OPTS = [ {k:'y', label:'Pro'}, {k:'a', label:'Enthalten'}, {k:'n', label:'Contra'} ];
+  var selectedVote = null;
+  function renderPoll(){
+    var box = document.getElementById('pollBox'); if (!box) return;
+    var total = base.y + base.a + base.n;
+    var maxk = 'y'; ['a','n'].forEach(function(k){ if (base[k] > base[maxk]) maxk = k; });
+    box.innerHTML = '';
+    POLL_OPTS.forEach(function(o){
+      var pct = Math.round(base[o.k] / total * 100);
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-vote', o.k);
+      b.className = 'pollrow' + (o.k === maxk ? ' win' : '') + (selectedVote === o.k ? ' sel' : '');
+      b.innerHTML = '<span class="pfill" style="width:' + pct + '%"></span>' +
+        '<span class="plabel">' + o.label + (selectedVote === o.k ? ' <span aria-hidden="true">✓</span>' : '') + '</span>' +
+        '<span class="ppct">' + pct + '%</span>';
+      box.appendChild(b);
+    });
+    document.getElementById('total').textContent = total.toLocaleString('de-DE');
+  }
+  function pickVote(v){
+    if (selectedVote === v) return;
+    if (selectedVote) base[selectedVote]--;
+    selectedVote = v; base[v]++;
+    document.getElementById('confirmVote').disabled = false;
+    document.getElementById('vote-hint').textContent = 'Vorschau – noch nicht bestätigt';
+    renderPoll();
+  }
+
+  /* ---- toast ---- */
+  var toast = document.getElementById('toast'), toastMsg = document.getElementById('toastMsg'), toastT;
+  function showToast(msg){ toastMsg.textContent = msg; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function(){ toast.classList.remove('show'); }, 1900); }
+
+  /* ---- global click delegation ---- */
+  document.addEventListener('click', function(e){
+    var el = e.target.closest('[data-go],[data-back],[data-tab-to],[data-fab],[data-filter],[data-accounts],[data-logout],[data-delete],[data-vote],[data-toast],#confirmVote');
+    if (!el) return;
+    if (el.hasAttribute('data-accounts')) { openAccounts(); return; }
+    if (el.hasAttribute('data-go')) { go(el.getAttribute('data-go')); return; }
+    if (el.hasAttribute('data-back')) { back(); return; }
+    if (el.hasAttribute('data-tab-to')) { goTab(el.getAttribute('data-tab-to')); return; }
+    if (el.hasAttribute('data-fab')) { openCreate(); return; }
+    if (el.hasAttribute('data-filter')) { openFilter(); return; }
+    if (el.hasAttribute('data-logout')) { logout(); return; }
+    if (el.hasAttribute('data-delete')) { confirmDelete(); return; }
+    if (el.hasAttribute('data-vote')) { pickVote(el.getAttribute('data-vote')); return; }
+    if (el.id === 'confirmVote') { showToast('Stimme gespeichert'); document.getElementById('vote-hint').textContent = 'Deine Stimme zählt'; el.disabled = true; return; }
+    if (el.hasAttribute('data-toast')) { showToast(el.getAttribute('data-toast')); return; }
+  });
+
+  /* create sheet via FAB */
+  function openCreate(){
+    sheetTitle.textContent = 'Neu erstellen · als ' + currentAccount.nm; sheetOpts.innerHTML = '';
+    ['problem','idee','diskussion','umfrage','beitrag'].forEach(function(k){
+      var t = TYPES[k];
+      var b = document.createElement('button'); b.type='button'; b.className='opt';
+      b.innerHTML = '<span style="display:flex;gap:12px;align-items:center">'+
+        '<span class="ptype '+t.cls+'" style="width:30px;height:30px;padding:0;justify-content:center;border-radius:9px">'+t.svg+'</span>'+
+        '<span><span style="display:block">'+t.label+'</span><span style="display:block;font-size:12px;color:var(--ink-3);font-weight:500">'+t.hint+'</span></span></span>'+
+        '<span class="ic" aria-hidden="true">›</span>';
+      b.addEventListener('click', function(){ closeSheet(); showToast(t.label+' – Editor kommt bald'); });
+      sheetOpts.appendChild(b);
+    });
+    sheetBg.classList.add('open'); requestAnimationFrame(function(){ sheet.classList.add('open'); });
+  }
+
+  /* ---- search: scope (political level) filter chips, multi-select ---- */
+  (function(){
+    var host = document.getElementById('searchScope'); if (!host) return;
+    REGION.forEach(function(r){
+      var b = document.createElement('button'); b.type='button';
+      b.className = 'tfilter' + (r.on ? ' on' : '');
+      b.setAttribute('aria-pressed', String(!!r.on));
+      b.innerHTML = '<span aria-hidden="true">'+r.fl+'</span><span>'+r.nm+'</span>';
+      b.addEventListener('click', function(){
+        r.on = !r.on; b.classList.toggle('on', r.on); b.setAttribute('aria-pressed', String(r.on));
+        showToast(r.nm + (r.on ? ' aktiv' : ' aus'));
+      });
+      host.appendChild(b);
+    });
+  })();
+
+  /* ---- search: build content-type filter chips ---- */
+  (function(){
+    var host = document.getElementById('searchTypes'); if (!host) return;
+    var chips = [{ k:'all', label:'Alle' }].concat(
+      ['problem','idee','diskussion','umfrage','beitrag'].map(function(k){ return { k:k, t:TYPES[k] }; }));
+    chips.forEach(function(c, i){
+      var b = document.createElement('button'); b.type='button';
+      b.className = 'tfilter' + (i===0 ? ' on' : '') + (c.t ? ' '+c.t.cls : '');
+      b.innerHTML = c.t ? (c.t.svg + '<span>'+c.t.label+'</span>') : c.label;
+      b.addEventListener('click', function(){
+        host.querySelectorAll('.tfilter').forEach(function(x){ x.classList.remove('on'); });
+        b.classList.add('on'); showToast('Filter: ' + (c.t ? c.t.label : c.label));
+      });
+      host.appendChild(b);
+    });
+  })();
+
+  /* ---- search: category filter chips, default OFF here (unlike Home) ---- */
+  (function(){
+    var host = document.getElementById('searchCats'); if (!host) return;
+    CATS.forEach(function(c){
+      var on = false; // Suche: keine Vorauswahl
+      var b = document.createElement('button'); b.type='button'; b.className='tfilter';
+      b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<span aria-hidden="true">'+c.fl+'</span><span>'+c.nm+'</span>';
+      b.addEventListener('click', function(){
+        on = !on; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+        showToast(c.nm + (on ? ' aktiv' : ' aus'));
+      });
+      host.appendChild(b);
+    });
+  })();
+
+  setAccount(ACCOUNTS[0]);
+  updateFilterBadge();
+  renderPoll();
+})();
+</script>

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+**/dist/
+build/
+**/build/
+.idea/
+.gradle/
+android/.gradle/
+android/app/build/
+.env
+.env.*
+!.env.example
+.secrets/
+npm-debug.log*
+.DS_Store

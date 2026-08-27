@@ -1,0 +1,17 @@
+default_platform(:android)
+
+platform :android do
+  desc "Upload the release App Bundle to the Google Play internal test track"
+  lane :internal do
+    upload_to_play_store(
+      package_name: "com.communityproject.openpolitics",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      track: ENV.fetch("PLAY_TRACK", "internal"),
+      json_key_data: ENV.fetch("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"),
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
